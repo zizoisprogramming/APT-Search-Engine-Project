@@ -1,6 +1,8 @@
 package org.example.searchengineapp;
 
 import java.io.*;
+import java.util.Set;
+
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
 
@@ -17,7 +19,7 @@ public class UiServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String query=request.getParameter("query");
         response.setContentType("text/html");
-        String result=q.process_query(query);
+        Set<String> result=q.process_query(query);
         // Hello
         PrintWriter out = response.getWriter();
         // Write HTML response with styling
