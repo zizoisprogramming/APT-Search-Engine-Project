@@ -28,6 +28,7 @@
       <artifactId>jersey-container-servlet</artifactId>
       <version>3.0.4</version>
     </dependency>
+
     <dependency>
       <groupId>org.glassfish.jersey.media</groupId>
       <artifactId>jersey-media-json-jackson</artifactId>
@@ -49,7 +50,19 @@
         <artifactId>junit-jupiter-engine</artifactId>
         <version>${junit.version}</version>
         <scope>test</scope>
-      </dependency>  </dependencies>
+      </dependency>
+      <dependency>
+          <groupId>org.apache.lucene</groupId>
+          <artifactId>lucene-core</artifactId>
+          <version>8.10.0</version>
+      </dependency>
+      <dependency>
+          <groupId>org.apache.lucene</groupId>
+          <artifactId>lucene-analyzers-common</artifactId>
+          <version>8.10.0</version>
+      </dependency>
+
+  </dependencies>
 
   <build>
     <plugins>
