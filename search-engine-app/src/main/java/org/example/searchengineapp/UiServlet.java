@@ -20,9 +20,23 @@ public class UiServlet extends HttpServlet {
         String result=q.process_query(query);
         // Hello
         PrintWriter out = response.getWriter();
-        out.println("<html><body>");
-        out.println("<h1>" + query+" "+result+ "</h1>");
-        out.println("</body></html>");
+        // Write HTML response with styling
+        out.println("<!DOCTYPE html>");
+        out.println("<html>");
+        out.println("<head>");
+        out.println("<title>Search Result</title>");
+        out.println("<style>");
+        out.println("body { font-family: Arial, sans-serif; background-color: #f2f2f2; margin: 0; padding: 0; }");
+        out.println("h1 { color: #333; text-align: center; }");
+        out.println("p { text-align: center; font-size: 18px; }");
+        out.println("</style>");
+        out.println("</head>");
+        out.println("<body>");
+        out.println("<h1>Search Result</h1>");
+        out.println("<p>Query: " + query + "</p>");
+        out.println("<p>Result: " + result + "</p>");
+        out.println("</body>");
+        out.println("</html>");
     }
 
     public void destroy() {
