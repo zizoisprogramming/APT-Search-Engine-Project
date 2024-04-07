@@ -1,8 +1,10 @@
 package org.example.searchengineapp;
 
+import com.mongodb.client.MongoCollection;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.bson.Document;
 
 import java.io.StringReader;
 import java.util.HashSet;
@@ -33,6 +35,12 @@ public class QueryProcessor {
     public Set<String> process_query(String query)
     {
         Set<String> normalizedQuery=Normalize(query);
+        connectDB c=new connectDB();
+        MongoCollection<Document> collection = c.connection();
+        
+        SearchQuery search = new SearchQuery();
+        search.Search(collection);
+
         return normalizedQuery;
     }
 }
