@@ -1,23 +1,18 @@
 package org.example.searchengineapp;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mongodb.client.MongoCursor;
-import com.mongodb.client.model.Filters;
 import org.bson.Document;
-import com.mongodb.client.MongoClients;
-import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoCursor;
-import com.mongodb.client.MongoDatabase;
-import org.bson.Document;
+import java.util.*;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import java.io.StringReader;
-import java.util.HashSet;
-import java.util.Set;
 public class SearchQuery
 {
+    private Map<PairSS,List<PairSI>> TagPos= new HashMap<>();
+    private Map<String,Integer> DF=new HashMap<>();
+    private  Map<PairSS,Integer> TF=new HashMap<>();
+    private Set<String> urls=new HashSet<>();
+
     public void Search(MongoCollection<Document> collection)
     {
         // Now perform your text search using $text operator
@@ -38,7 +33,6 @@ public class SearchQuery
             //push object to list of web pages //ely hn3mlha ranking
             //
             Document document = cursor.next();
-
             String field1Value = document.getString("word");
             List<Document> field2Value = (List<Document>) document.get("docs");
             System.out.println(field2Value.size());
@@ -51,17 +45,62 @@ public class SearchQuery
         }
         //return list of objects
     }
+    public void mapping(Document doc,String word) throws JsonProcessingException
+    {
+        List<Document> field2Value = new ArrayList<>();
+        field2Value.add((Document) doc.get(word));
+        Document str=field2Value.get(0);
+        List<Document> sec= (List<Document>) str.get("details");
+        for(Document d1:sec)
+        {
+            String s=d1.getString("url");
+            urls.add(s);
+            Integer n=d1.getInteger("tf");
+            PairSS temp1=new PairSS(word,s);
+            TF.put(temp1,n);
+            List<Document> locs= (List<Document>) d1.get("locs");
+            for (Document l:locs)
+            {
+                String tag=l.getString("tag");
+                Integer p=l.getInteger("pos");
+                PairSI temp=new PairSI(tag,p);
+
+                List<PairSI> psilist=TagPos.get(temp1);
+                if(psilist==null)
+                {
+                    psilist=new ArrayList<PairSI>();
+                    psilist.add(temp);
+                }
+                else
+                {
+                    psilist.add(temp);
+                }
+                TagPos.put(temp1,psilist);
+            }
+        }
+        Integer val2 = str.getInteger("count");
+        DF.put(word,val2);
+    }
     public List<Document> filter_collection(MongoCollection<Document> collection, Set<String> query_words)
     {
 
         // List to store the matching documents
         List<Document> matchingDocs = new ArrayList<>();
 
-        // Iterate over the collection and collect documents matching the filter
-        for (Document doc : collection.find()) {
-            if (query_words.contains(doc.getString("word"))) {
-                // Add the matching document to the list
-                matchingDocs.add(doc);
+        // Iterate over the words and collect documents matching
+        for(String str : query_words)
+        {
+            Document query = new Document(str, new Document("$exists", true));
+            Document result = collection.find(query).first();
+
+            if(collection.countDocuments(query)>0)
+            {
+                matchingDocs.add(result);
+                try {
+                    mapping(result,str);
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
         // Print or process the matching documents
