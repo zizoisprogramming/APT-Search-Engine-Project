@@ -1,4 +1,3 @@
-import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.MongoConfigurationException;
@@ -9,11 +8,11 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.DeleteResult;
+import com.mongodb.client.result.InsertOneResult;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -25,7 +24,7 @@ public class database {
         "url_list":
             [
                 {
-                    "url" : "",
+                    "_id" : url,
                     "loc" : [(pos,index)],
                     "tf" :
                 },
@@ -33,17 +32,16 @@ public class database {
         "count" :
     }
     */
-    String databaseName = "Web-urls";
-    String username = "gamd";
-    String password = "hobaellala";
-    MongoClient mongoClient;
-    String connectionString;
-    MongoDatabase mydatabase;
-    MongoCollection<Document> collection;
+    private String databaseName = "Web-urls";
+    private MongoClient mongoClient;
+    private MongoDatabase mydatabase;
+    private MongoCollection<Document> collection;
+    // THIS IS A MUST TO CONNECT TO THE DATABASE
     public void startConnection() {
-        connectionString = "mongodb+srv://" + username + ":" + password + "@web-urls.dskow3y.mongodb.net/?retryWrites=true&w=majority&appName=Web-urls";
+        String connectionString = "mongodb://localhost:27017";
         try {
             mongoClient = MongoClients.create(connectionString);
+            System.out.println("Successfully connected to the database.");
             // Use the MongoClient instance
         } catch (MongoConfigurationException e) {
             // Handle the exception
@@ -63,14 +61,18 @@ public class database {
             return false; // false
         List<Document> sites = new ArrayList<>(); // Initialize a list for urls
         // To be updated if there is change in structure
-        sites.add(new Document()
-                     .append("url",site)
-                        .append("loc",locs)
-                            .append("tf", tf));
+        sites.add(new Document("_id", site)
+                .append("loc",locs)
+                .append("tf", tf));
         // make a new document with _id the word
         doc = new Document("_id",word).append("url_list",sites).append("count",count);
-        collection.insertOne(doc); // insert
-        return true;
+        InsertOneResult result = collection.insertOne(doc); // insert
+        if(result.wasAcknowledged()) {
+            System.out.println("Inserted..");
+            return true;
+        }
+
+        return false;
     }
 
     public boolean updateSites(String word, String site, ArrayList<Map<String,Integer>> locs , int tf) {
@@ -81,13 +83,12 @@ public class database {
             return false;
         }
         // new object to be added to the array
-        Document sites = new Document()
-                            .append("url",site)
-                                .append("loc",locs)
-                                    .append("tf", tf);
+        Document sites = new Document("_id",site)
+                .append("loc",locs)
+                .append("tf", tf);
         // push the object to the array of urls
         UpdateResult result = collection.updateOne(Filters.eq("_id",word),
-                                            Updates.push("url_list", sites));
+                Updates.push("url_list", sites));
         // If modification happened
         if(result.getModifiedCount() == 1) {
             System.out.println("Updated..");
@@ -112,7 +113,7 @@ public class database {
     public boolean updateCount(String word, int count) {
 
         UpdateResult result = collection.updateOne(Filters.eq("_id",word),
-                                                    Updates.set("count", count));
+                Updates.set("count", count));
         if(result.getModifiedCount() == 1) {
             System.out.println("Updated..");
             return true;
@@ -134,6 +135,7 @@ public class database {
         System.out.println("Ouch..");
         return false;
     }
+    // THIS IS A MUST TO END CONNECTION TO THE DATABASE
     public void endConnection() {
         mongoClient.close();
     }
