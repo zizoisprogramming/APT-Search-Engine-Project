@@ -100,11 +100,21 @@ public class indexer {
         return index;
     }
     private static database mydb = new database();
+    public static boolean isValidURL(String url) {
+        try {
+            new java.net.URL(url).toURI();
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
     private static int getContent(String url) {
         /* connect to the url and get the content */
         int wordsCount = 0;
         int index = 0;
         try {
+            if(!isValidURL(url))
+                return 0;
             Connection con = Jsoup.connect(url);
             Document doc = con.get();
 
