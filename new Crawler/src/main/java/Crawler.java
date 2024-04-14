@@ -47,6 +47,7 @@ class Crawler {
             }
         }
     }
+
     public static void outgoingLinks()
     {
         webDB WEBDB;
@@ -54,6 +55,8 @@ class Crawler {
         Map<String, List<String>> outgoing_links = new HashMap<String, List<String>>();
         Map<String, Vector<String>> linksContent = new HashMap<String, Vector<String>>();
         int count = 0;
+        int sizeError = 0;
+        int unlocated = 0;
         for(String url: SharedVars.files)
         {
             System.out.println("Getting Links " + count);
@@ -82,19 +85,45 @@ class Crawler {
                     }
                     outgoing_links.put(url, links);
                 }
+                if(!linksContent.containsKey(url) || linksContent.get(url).size() != 2)
+                {
+                    if (!linksContent.containsKey(url) )
+                    {
+                        unlocated++;
+                    }
+                    else
+                    {
+                        sizeError++;
+                    }
+                    WEBDB.write_url(url, "", "");
+                    System.out.println("Error in Vector size: " + sizeError + " Error in location: " + unlocated);
+                }
+                else
+                {
+                    WEBDB.write_url(url, linksContent.get(url).get(0), linksContent.get(url).get(1));
+                }
+                if(!outgoing_links.containsKey(url))
+                {
+                    WEBDB.insert_to_DB(url, new ArrayList<String>());
+                }
+                else {
+                    System.out.println("OutgoingSize " + outgoing_links.get(url).size());
+                    WEBDB.insert_to_DB(url, outgoing_links.get(url));
+                }
+                linksContent.clear();
+                outgoing_links.clear();
+
             } catch (IOException e) {
 
             }
         }
         int DBinserted = 0;
-        int sizeError = 0;
-        int unlocated = 0;
-        for(String url: SharedVars.files) {
+        /*for(String url: SharedVars.files) {
             System.out.println("Inserting to DB: " + DBinserted);
             DBinserted++;
             if(DBinserted == 100)
             {
-                //break;
+                break;
             }
             if(!linksContent.containsKey(url) || linksContent.get(url).size() != 2)
             {
@@ -121,7 +150,7 @@ class Crawler {
                 System.out.println("OutgoingSize " + outgoing_links.get(url).size());
                 WEBDB.insert_to_DB(url, outgoing_links.get(url));
             }
-        }
+        }*/
     }
 
     private static void readCompactStrings(String filePath) {
