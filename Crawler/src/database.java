@@ -36,6 +36,21 @@ public class database {
     private MongoClient mongoClient;
     private MongoDatabase mydatabase;
     private MongoCollection<Document> collection;
+    public boolean incCount(String word) {
+        int count = 0;
+        Document doc = collection.find(new Document("_id",word)).first();
+        if(doc == null)
+            return false;
+        count = doc.getInteger("count");
+        UpdateResult result = collection.updateOne(Filters.eq("_id",word),
+                Updates.set("count", count + 1));
+        if(result.getModifiedCount() == 1) {
+            //System.out.println("Updated..");
+            return true;
+        }
+        System.out.println("Ouch..");
+        return false;
+    }
     // THIS IS A MUST TO CONNECT TO THE DATABASE
     public void startConnection() {
         String connectionString = "mongodb://localhost:27017";
@@ -51,11 +66,18 @@ public class database {
         mydatabase = mongoClient.getDatabase(databaseName);
         collection = mydatabase.getCollection("urls");
     }
-
+    public Document getWord(String word) {
+        Document doc = collection.find(new Document("_id",word)).first();
+        if(doc == null)
+            System.out.println("Not there, Returned null.");
+        else
+            System.out.println("Returned.");
+        return doc;
+    }
     // this add function
     // return false if it already exists
     // else adds the document and return true;
-    public boolean add(String word, String site, ArrayList<Map<String,Integer>> locs , int tf, int count) {
+    public boolean add(String word, String site, ArrayList<Map<String,Integer>> locs , float tf, int count) {
         Document doc = collection.find(Filters.eq("_id", word)).first();
         if(doc != null) // If found before
             return false; // false
@@ -68,14 +90,14 @@ public class database {
         doc = new Document("_id",word).append("url_list",sites).append("count",count);
         InsertOneResult result = collection.insertOne(doc); // insert
         if(result.wasAcknowledged()) {
-            System.out.println("Inserted..");
+            //System.out.println("Inserted..");
             return true;
         }
 
         return false;
     }
 
-    public boolean updateSites(String word, String site, ArrayList<Map<String,Integer>> locs , int tf) {
+    public boolean updateSites(String word, String site, ArrayList<Map<String,Integer>> locs , float tf) {
         // Find the doc first
         Document doc = collection.find(Filters.eq("_id", word)).first();
         if(doc == null) { // It doesn't exist
@@ -91,7 +113,8 @@ public class database {
                 Updates.push("url_list", sites));
         // If modification happened
         if(result.getModifiedCount() == 1) {
-            System.out.println("Updated..");
+            //System.out.println("Updated..");
+            boolean incremented = incCount(word);
             return true;
         }
         return false;
@@ -115,7 +138,7 @@ public class database {
         UpdateResult result = collection.updateOne(Filters.eq("_id",word),
                 Updates.set("count", count));
         if(result.getModifiedCount() == 1) {
-            System.out.println("Updated..");
+            //System.out.println("Updated..");
             return true;
         }
         System.out.println("Ouch..");
@@ -128,7 +151,7 @@ public class database {
                 Updates.set("tf", tf));
         // if # of modified is 1 then update took place
         if(result.getModifiedCount() == 1) {
-            System.out.println("Updated..");
+            //System.out.println("Updated..");
             return true;
         }
         // error
