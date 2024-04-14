@@ -3,6 +3,7 @@ package org.example.searchengineapp;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
 import javassist.compiler.ast.Pair;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.en.EnglishAnalyzer;
@@ -54,16 +55,13 @@ public class QueryProcessor {
 
     public void mapping(Document doc,String word) throws JsonProcessingException
     {
-        List<Document> field2Value = new ArrayList<>();
-        field2Value.add((Document) doc.get(word));
-        Document str=field2Value.get(0);
-        List<Document> sec= (List<Document>) str.get("details");
+        List<Document> sec= (List<Document>) doc.get("doc");
         for(Document d1:sec)
         {
-            String s=d1.getString("url");
-            urlScore.put(s,0);
+            String url=d1.getString("_id");
+            urlScore.put(url,0);
             Integer n=d1.getInteger("tf");
-            PairSS temp1=new PairSS(word,s);
+            PairSS temp1=new PairSS(word,url);
             TF.put(temp1,n);
             List<Document> locs= (List<Document>) d1.get("locs");
             for (Document l:locs)
@@ -85,7 +83,7 @@ public class QueryProcessor {
                 TagPos.put(temp1,psilist);
             }
         }
-        Integer val2 = str.getInteger("count");
+        Integer val2 = doc.getInteger("count");
         DF.put(word,val2);
     }
     public List<Document> filter_collection(MongoCollection<Document> collection, Set<String> query_words)
@@ -96,10 +94,8 @@ public class QueryProcessor {
         // Iterate over the words and collect documents matching
         for(String str : query_words)
         {
-            Document query = new Document(str, new Document("$exists", true));
-            Document result = collection.find(query).first();
-
-            if(collection.countDocuments(query)>0)
+            Document result = collection.find(Filters.eq("_id", str)).first();
+            if(result!=null)
             {
                 matchingDocs.add(result);
                 try {
