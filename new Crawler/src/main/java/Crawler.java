@@ -3,9 +3,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
+
 import org.jsoup.Connection;
 import java.io.File;
 import org.jsoup.Jsoup;
@@ -48,6 +47,82 @@ class Crawler {
             }
         }
     }
+    public static void outgoingLinks()
+    {
+        webDB WEBDB;
+        WEBDB = new webDB();
+        Map<String, List<String>> outgoing_links = new HashMap<String, List<String>>();
+        Map<String, Vector<String>> linksContent = new HashMap<String, Vector<String>>();
+        int count = 0;
+        for(String url: SharedVars.files)
+        {
+            System.out.println("Getting Links " + count);
+            count++;
+            if(count == 100)
+            {
+                //break;
+            }
+            try {
+                Connection con = Jsoup.connect(url);
+                Document doc = con.get();
+                if (con.response().statusCode() == 200) {
+                    Vector<String> temp = new Vector<String>();
+                    temp.add(doc.title());
+                    temp.add(doc.body().text());
+                    linksContent.put(url, temp);
+                    List<String> links = new ArrayList<String>();
+                    for (Element link : doc.select("a[href]")) {
+                        String nextLink = link.absUrl("href");
+                        if(!SharedVars.files.contains(nextLink))
+                        {
+                            continue;
+                        }
+
+                        links.add(nextLink);
+                    }
+                    outgoing_links.put(url, links);
+                }
+            } catch (IOException e) {
+
+            }
+        }
+        int DBinserted = 0;
+        int sizeError = 0;
+        int unlocated = 0;
+        for(String url: SharedVars.files) {
+            System.out.println("Inserting to DB: " + DBinserted);
+            DBinserted++;
+            if(DBinserted == 100)
+            {
+                //break;
+            }
+            if(!linksContent.containsKey(url) || linksContent.get(url).size() != 2)
+            {
+                if (!linksContent.containsKey(url) )
+                {
+                    unlocated++;
+                }
+                else
+                {
+                    sizeError++;
+                }
+                WEBDB.write_url(url, "", "");
+                System.out.println("Error in Vector size: " + sizeError + " Error in location: " + unlocated);
+            }
+            else
+            {
+                WEBDB.write_url(url, linksContent.get(url).get(0), linksContent.get(url).get(1));
+            }
+            if(!outgoing_links.containsKey(url))
+            {
+                WEBDB.insert_to_DB(url, new ArrayList<String>());
+            }
+            else {
+                System.out.println("OutgoingSize " + outgoing_links.get(url).size());
+                WEBDB.insert_to_DB(url, outgoing_links.get(url));
+            }
+        }
+    }
 
     private static void readCompactStrings(String filePath) {
         synchronized (SharedVars.stringsLock) {
@@ -66,7 +141,7 @@ class Crawler {
 
     public static void main(String[] args) {
         // Program logic
-        String filePath = "F:\\APT-Search-Engine-Project\\Crawler\\src\\seed.txt";
+        String filePath = "./seed.txt";
         readSeed(filePath, true);
 
         // SharedVars.numThreads = Integer.parseInt(args[0]); // Set the number of threads
@@ -115,6 +190,12 @@ class Crawler {
                 e.printStackTrace();
             }
         }
+        long startTime = System.currentTimeMillis();
+        outgoingLinks();
+        long endTime = System.currentTimeMillis();
+        long timeElapsed = endTime - startTime;
+        float minutes = timeElapsed / 60000;
+        System.out.println("Time elapsed: " + minutes + " minutes");
         // Exiting the program
     }
 }
@@ -133,13 +214,14 @@ class SharedVars {
     public static final String LINKS_OUTPUT_FILE = "links.txt"; // File for storing crawled links
     public static final String COMPACT_STRINGS_OUTPUT_FILE = "compact_strings.txt"; // File for storing compact strings
 }
+
 class spiderWebs implements Runnable {
     public static int freeIndex = 0; // the First free index for dynamic allocation of resources
     int myIndex; // the index the current thread is working on
     private static boolean flag = true;
-    private static webDB WEBDB;
+    // 1. private static webDB WEBDB;
     spiderWebs(int i) {
-        WEBDB=new webDB();
+        //1.WEBDB=new webDB();
         myIndex = i; // set the start
         freeIndex = SharedVars.numThreads + 1; // starting free index.
     }
@@ -248,17 +330,17 @@ class spiderWebs implements Runnable {
                     String compactString = compactString(doc.text());
                     // links lock for synchronization
                     synchronized (SharedVars.linksLock) {
-                        List<String> outgoing_links= new ArrayList<String>();
+                        //     1.  List<String> outgoing_links= new ArrayList<String>();
                         for (Element link : doc.select("a[href]")) {
 
                             String nextLink = link.absUrl("href");
-                            outgoing_links.add(nextLink);
+                            //  1. outgoing_links.add(nextLink);
                             if (!SharedVars.files.contains(nextLink)) {
                                 System.out.println("Found: " + nextLink);
                                 //write crawled link to db
-                                Connection con_next = Jsoup.connect(nextLink);
-                                Document doc_next = con_next.get();
-                                WEBDB.write_url(nextLink,doc_next.title(),doc_next.body().text());
+                                //   1. Connection con_next = Jsoup.connect(nextLink);
+                                //   1. Document doc_next = con_next.get();
+                                //   1. WEBDB.write_url(nextLink,doc_next.title(),doc_next.body().text());
                                 linksWriter.write(nextLink + "\n"); // Write crawled link to output file
                                 SharedVars.files.addElement(nextLink);
                                 synchronized (SharedVars.indexLock) {
@@ -268,7 +350,7 @@ class spiderWebs implements Runnable {
                                 System.out.println("Already Contained: " + nextLink);
                             }
                         }
-                        WEBDB.insert_to_DB(url,outgoing_links);
+                        //1. WEBDB.insert_to_DB(url,outgoing_links);
                     }
                     synchronized (SharedVars.stringsLock) {
                         if (!SharedVars.CompactStrings.contains(compactString)) {
