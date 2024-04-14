@@ -20,7 +20,7 @@ import java.util.Map;
 public class pageRanker {
     //data base
     private static final String MONGODB_DATABASE_NAME = "webPages";
-    private static final String MONGODB_COLLECTION_NAME = "webPages_collection";
+    private static final String MONGODB_COLLECTION_NAME = "dum";
 
     //PR algorithm
     private static final double DAMPING_FACTOR = 0.85;
@@ -46,6 +46,7 @@ public class pageRanker {
         }
     }
     private static List<WebPage> retrieveWebPages(MongoCollection<Document> collection) {
+
         List<WebPage> webPages = new ArrayList<>();
         FindIterable<Document> documents = collection.find();
 
