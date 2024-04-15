@@ -4,8 +4,8 @@ import java.io.PrintStream;
 
 public class PairSS
 {
-    String first;
-    String sec;
+    private String first;
+    private String sec;
 
     public PairSS(String f,String s)
     {
