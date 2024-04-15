@@ -132,11 +132,12 @@ public class UiServlet extends HttpServlet {
         out.println("</head>");
         out.println("<body>");
         out.println("<h1>Search Result</h1>");
+
         out.println("<form action=\"ui-servlet\" method=\"get\">");
-        out.println("Enter your query: <input type=\"text\" name=\"query\">");
+        out.println("Enter your query: <input type=\"text\" name=\"query\" value=\""+query+"\">");
         out.println("<button type=\"submit\">Submit</button>");
         out.println("</form>");
-        out.println("<p>Query: " + query + "</p>");
+//        out.println("<p>Query: " + query + "</p>");
 
         for (int i=startIndex;i<endIndex;i++)
         {
