@@ -1,6 +1,7 @@
 package org.example.searchengineapp;
 
 import java.io.*;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -42,17 +43,46 @@ public class UiServlet extends HttpServlet {
         out.println("<p>Query: " + query + "</p>");
         for (WebPage wp:result)
         {
+            String body_html=formatbody(wp.getBody(),query);
             out.println("<div class=\"result\">");
             out.println("<h4>Title: " + wp.getTitle() + "</h4>");
             out.println("<a href=\""+wp.getUrl()+"\">Url: " + wp.getUrl() + "</a>");
-            out.println("<p>Paragraph: " + wp.getBody() + "</p>");
+            out.println(body_html);
             out.println("</div>" );
 
         }
         out.println("</body>");
         out.println("</html>");
     }
+    private String formatbody(String body,String query)
+    {
+        String[] words = body.split("\\s+");
+        String[] highlightWords_aux=query.split("\\s+");
+        // set for query words
+        Set<String> highlightWords = new HashSet<>();
 
+        // Add words to the set
+        for (String word : highlightWords_aux) {
+            highlightWords.add(word.toLowerCase());
+        }
+        StringBuilder htmlOutput = new StringBuilder("<p>Paragraph: ");
+
+        for (String word : words) {
+             if (highlightWords.contains(word.toLowerCase())){
+                // Highlight
+                htmlOutput.append("<b>").append(word).append("</b>");
+            } else {
+                htmlOutput.append(word);
+            }
+            // add space
+            htmlOutput.append(" ");
+        }
+
+        // Close the paragraph tag
+        htmlOutput.append("</p>");
+        return htmlOutput.toString();
+    }
     public void destroy() {
     }
+
 }
