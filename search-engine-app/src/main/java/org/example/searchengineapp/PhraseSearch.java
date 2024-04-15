@@ -21,16 +21,19 @@ public class PhraseSearch
     }
     public void phraseSearch(String query, Map<String,Double> urlScore)
     {
-        query.replace('\"',' ');
+        String modified_query=query.replace("\"", "");
         List<String> toberemoved=new ArrayList<>();
         for (Map.Entry<String, Double> entry : urlScore.entrySet())
         {
             Document result = webpagesConnect.find(entry.getKey());
+            System.out.println("phrase searching "+result);
             if(result!=null)
             {
+                System.out.println("now scanning"+entry.getKey());
                 String body = result.getString("body");
-                if (!body.contains(query))
+                if (!body.toLowerCase().contains(modified_query))
                 {
+                    System.out.println("phrase found at"+entry.getKey());
                     System.out.println(body.contains("false"));
                     toberemoved.add(entry.getKey());
                 }
