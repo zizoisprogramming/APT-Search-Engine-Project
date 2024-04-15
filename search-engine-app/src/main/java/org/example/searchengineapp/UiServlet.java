@@ -20,6 +20,8 @@ public class UiServlet extends HttpServlet {
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String query=request.getParameter("query");
+        long startTime = System.currentTimeMillis();
+
         int page=1;
         if(request.getParameter("page")!=null)
         {
@@ -29,11 +31,14 @@ public class UiServlet extends HttpServlet {
 
 
         response.setContentType("text/html");
+
         List<WebPage> result=q.process_query(query);
 
         // Calculate the starting index and ending index for the current page
         int startIndex = (page - 1) * resultsPerPage;
         int endIndex = Math.min(startIndex + resultsPerPage, result.size());
+        long endTime = System.currentTimeMillis();
+        long elapsedTime = endTime - startTime;
 
         // Hello
         PrintWriter out = response.getWriter();
@@ -138,6 +143,8 @@ public class UiServlet extends HttpServlet {
         out.println("Enter your query: <input type=\"text\" name=\"query\" value=\""+query+"\">");
         out.println("<button type=\"submit\">Submit</button>");
         out.println("</form>");
+
+        out.println("<p>Elapsed Time: " + elapsedTime+" milliseconds "+result.size()+" results</p>");
 //        out.println("<p>Query: " + query + "</p>");
 
         for (int i=startIndex;i<endIndex;i++)
@@ -162,6 +169,9 @@ public class UiServlet extends HttpServlet {
 
         out.println("</body>");
         out.println("</html>");
+        q.clean_up();
+
+
     }
     private String formatbody(String body,String query)
     {

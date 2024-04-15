@@ -140,6 +140,7 @@ public class QueryProcessor {
             Document result = collection.find(Filters.eq("_id", str)).first();
             if(result!=null)
             { //result has the document with id=word
+                System.out.println("found matching doc for word "+str+"doc is"+result);
                 matchingDocs.add(result);
                 try {
                     mapping(result,str);
@@ -147,6 +148,10 @@ public class QueryProcessor {
                 catch (JsonProcessingException e) {
                     throw new RuntimeException(e);
                 }
+            }
+            else
+            {
+                System.out.println("no matching docs"+str);
             }
         }
         // Print or process the matching documents
@@ -231,5 +236,11 @@ public class QueryProcessor {
             Double value = urlScore.get(key);
             System.out.println("url: " + key + ", score: " + value);
         }
+    }
+    public void clean_up()
+    {
+       urlScore.clear();
+       TF.clear();
+       DF.clear();
     }
 }
