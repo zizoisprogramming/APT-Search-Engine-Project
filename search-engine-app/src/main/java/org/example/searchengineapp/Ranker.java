@@ -108,27 +108,29 @@ public class Ranker {
     public void setRelevantParagraph(WebPage wp,String query)
     {
         boolean phrasing = false;
+        String text=query;
         if(query.contains("\""))
         {
-            query.replaceAll("\"","");
+            text=query.replaceAll("\"","");
             phrasing=true;
         }
         Integer index=0;
         if(phrasing)
         {
-            index=wp.getBody().toLowerCase().indexOf(query.toLowerCase());
+            index=wp.getBody().toLowerCase().indexOf(text.toLowerCase());
         }
         else
         {
-            String[] words=query.split(" ");
+            String[] words=text.split(" ");
 //            PorterStemmer obj=new PorterStemmer();
             for(String str:words)
             {
 //                String stemmed = obj.stem(str);
                 if(wp.getBody().toLowerCase().indexOf(str.toLowerCase())>0)
-                index=wp.getBody().toLowerCase().indexOf(str.toLowerCase());
+                    index=wp.getBody().toLowerCase().indexOf(str.toLowerCase());
             }
         }
+        System.out.println(index);
         Integer start=0,end=0;
         if(index-100>0)
         {
@@ -148,6 +150,6 @@ public class Ranker {
         }
         String relevantParagraph=wp.getBody().substring(start,end)+"...";
         wp.setBody(relevantParagraph);
-        System.out.println(relevantParagraph);
+//        System.out.println(relevantParagraph);
     }
 }

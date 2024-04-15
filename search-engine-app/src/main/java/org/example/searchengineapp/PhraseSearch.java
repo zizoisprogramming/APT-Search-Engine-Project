@@ -31,10 +31,10 @@ public class PhraseSearch
             {
                 System.out.println("now scanning"+entry.getKey());
                 String body = result.getString("body");
-                if (!body.toLowerCase().contains(modified_query))
+                System.out.println(body);
+                if (!body.toLowerCase().contains(modified_query.toLowerCase()))
                 {
-                    System.out.println("phrase found at"+entry.getKey());
-                    System.out.println(body.contains("false"));
+                    System.out.println(body.contains("phrase not found"));
                     toberemoved.add(entry.getKey());
                 }
             }
