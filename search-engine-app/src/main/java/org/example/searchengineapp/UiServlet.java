@@ -20,8 +20,21 @@ public class UiServlet extends HttpServlet {
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String query=request.getParameter("query");
+        int page=1;
+        if(request.getParameter("page")!=null)
+        {
+            page = Integer.parseInt(request.getParameter("page")); // Get the requested page number
+        }
+        int resultsPerPage = 10; // Number of results per page
+
+
         response.setContentType("text/html");
         List<WebPage> result=q.process_query(query);
+
+        // Calculate the starting index and ending index for the current page
+        int startIndex = (page - 1) * resultsPerPage;
+        int endIndex = Math.min(startIndex + resultsPerPage, result.size());
+
         // Hello
         PrintWriter out = response.getWriter();
         // Write HTML response with styling
@@ -36,13 +49,18 @@ public class UiServlet extends HttpServlet {
         out.println("p {margin: 0; padding: 0; }");
         out.println("a { font-size:11px; }");
         out.println(".result { margin: 10px; padding: 10px; }");
+        out.println(".pagination_section {display: flex;justify-content: center;align-items: center;margin: 10px; padding: 10px;}");
+        out.println(".pagination_section a { color: black; padding: 10px 18px; text-decoration: none; }");
+        out.println(".pagination_section a:hover:not(.active) { background-color: #031F3B; color: white; }");
         out.println("</style>");
         out.println("</head>");
         out.println("<body>");
         out.println("<h1>Search Result</h1>");
         out.println("<p>Query: " + query + "</p>");
-        for (WebPage wp:result)
+
+        for (int i=startIndex;i<endIndex;i++)
         {
+            WebPage wp=result.get(i);
             String body_html=formatbody(wp.getBody(),query);
             out.println("<div class=\"result\">");
             out.println("<h4>Title: " + wp.getTitle() + "</h4>");
@@ -51,6 +69,15 @@ public class UiServlet extends HttpServlet {
             out.println("</div>" );
 
         }
+        // Generate pagination links
+        int totalPages = (int) Math.ceil((double) result.size() / resultsPerPage);
+        out.println("<div class=\"pagination_section\">");
+        for (int i = 1; i <= totalPages; i++)
+        {
+            out.println("<a href=\"?query=" + query + "&page=" + i + "\">Page " + i + "</a>");
+        }
+        out.println("</div>" );
+
         out.println("</body>");
         out.println("</html>");
     }
