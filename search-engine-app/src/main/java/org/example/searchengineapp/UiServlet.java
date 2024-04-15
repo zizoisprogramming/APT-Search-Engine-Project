@@ -134,6 +134,7 @@ public class UiServlet extends HttpServlet {
         out.println("<h1>Search Result</h1>");
 
         out.println("<form action=\"ui-servlet\" method=\"get\">");
+        query=query.replaceAll("\"","");
         out.println("Enter your query: <input type=\"text\" name=\"query\" value=\""+query+"\">");
         out.println("<button type=\"submit\">Submit</button>");
         out.println("</form>");
