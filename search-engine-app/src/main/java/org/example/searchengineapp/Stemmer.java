@@ -1,4 +1,4 @@
-//package main.java;
+package org.example.searchengineapp;//package main.java;
 
 public interface Stemmer {
 

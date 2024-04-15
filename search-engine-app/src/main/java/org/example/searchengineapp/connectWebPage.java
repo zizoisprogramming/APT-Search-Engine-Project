@@ -1,14 +1,11 @@
 package org.example.searchengineapp;
 
-
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
-import java.util.List;
 
-public class connectDB
+public class connectWebPage
 {
     public MongoCollection<Document> connection()
     {
@@ -16,8 +13,8 @@ public class connectDB
         MongoClient mongoClient = new MongoClient( "localhost" , 27017 );
         System.out.println("Created Mongo Connection successfully");
 
-        MongoDatabase db = mongoClient.getDatabase("Web-urls");
-        MongoCollection<Document> collection= db.getCollection("urls");
+        MongoDatabase db = mongoClient.getDatabase("webPages");
+        MongoCollection<Document> collection= db.getCollection("dum");
 
         return collection;
     }
