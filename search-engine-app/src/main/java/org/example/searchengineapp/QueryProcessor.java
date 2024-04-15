@@ -157,7 +157,7 @@ public class QueryProcessor {
 
     }
 
-    public Set<String> process_query(String query)
+    public List<WebPage> process_query(String query)
     {
         Set<String> normalizedQuery=Normalize(query); //stemming
 
@@ -223,7 +223,7 @@ public class QueryProcessor {
         }
 
         //this should return list of ranked webPages
-        return normalizedQuery;
+        return rankedWebPages;
     }
     private  void printScoreMap() //for debugging
     {
