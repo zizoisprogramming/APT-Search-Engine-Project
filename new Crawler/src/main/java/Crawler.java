@@ -66,6 +66,10 @@ class Crawler {
                 //break;
             }
             try {
+                if (!spiderWebs.isValidURL(url)) {
+                    System.out.println("Invalid URL: " + url);
+                    continue;
+                }
                 Connection con = Jsoup.connect(url);
                 Document doc = con.get();
                 if (con.response().statusCode() == 200) {
