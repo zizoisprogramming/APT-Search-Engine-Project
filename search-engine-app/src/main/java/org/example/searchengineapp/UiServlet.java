@@ -42,17 +42,88 @@ public class UiServlet extends HttpServlet {
         out.println("<html>");
         out.println("<head>");
         out.println("<title>Search Result</title>");
-        out.println("<style>");
-        out.println("body { font-family: Arial, sans-serif; background-color: #f2f2f2; margin: 0; padding: 0; }");
-        out.println("h1 { color: #333; text-align: center; }");
-        out.println("h4 { color: #333; margin: 0; padding: 0; }");
-        out.println("p {margin: 0; padding: 0; }");
-        out.println("a { font-size:11px; }");
-        out.println(".result { margin: 10px; padding: 10px; }");
-        out.println(".pagination_section {display: flex;justify-content: center;align-items: center;margin: 10px; padding: 10px;}");
-        out.println(".pagination_section a { color: black; padding: 10px 18px; text-decoration: none; }");
-        out.println(".pagination_section a:hover:not(.active) { background-color: #031F3B; color: white; }");
-        out.println("</style>");
+       out.println("<style>\n" +
+               "    body {\n" +
+               "        font-family: Arial, sans-serif;\n" +
+               "        background-color: #f2f2f2;\n" +
+               "        margin: 0;\n" +
+               "        padding: 20px;\n" +
+               "    }\n" +
+               "\n" +
+               "    h1 {\n" +
+               "        color: #1a0dab;\n" +
+               "        text-align: center;\n" +
+               "    }\n" +
+               "\n" +
+               "    h4 {\n" +
+               "        color: #1a0dab;\n" +
+               "        margin: 0;\n" +
+               "        padding: 0;\n" +
+               "        font-size: 18px;\n" +
+               "        margin-bottom: 5px;\n" +
+               "    }\n" +
+               "\n" +
+               "    p {\n" +
+               "        margin: 0;\n" +
+               "        padding: 0;\n" +
+               "        font-size: 14px;\n" +
+               "        color: #4d5156;\n" +
+               "    }\n" +
+               "\n" +
+               "    a {\n" +
+               "        color: #1a0dab;\n" +
+               "        text-decoration: none;\n" +
+               "    }\n" +
+               "\n" +
+               "    .result {\n" +
+               "        margin: 20px 0;\n" +
+               "        padding: 10px;\n" +
+               "        background-color: #fff;\n" +
+               "        border-radius: 8px;\n" +
+               "        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);\n" +
+               "    }\n" +
+               "\n" +
+               "    .result:hover {\n" +
+               "        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);\n" +
+               "    }\n" +
+               "\n" +
+               "    .result a {\n" +
+               "        font-size: 14px;\n" +
+               "        color: #1a0dab;\n" +
+               "    }\n" +
+               "\n" +
+               "    .result a:hover {\n" +
+               "        text-decoration: underline;\n" +
+               "    }\n" +
+               "\n" +
+               "    .highlight {\n" +
+               "        background-color: #ffa;\n" +
+               "    }\n" +
+               "\n" +
+               "    .pagination_section {\n" +
+               "        display: flex;\n" +
+               "        justify-content: center;\n" +
+               "        align-items: center;\n" +
+               "        margin-top: 20px;\n" +
+               "    }\n" +
+               "\n" +
+               "    .pagination_section a {\n" +
+               "        color: #1a0dab;\n" +
+               "        padding: 5px 10px;\n" +
+               "        margin: 0 5px;\n" +
+               "        border: 1px solid #dadce0;\n" +
+               "        border-radius: 2px;\n" +
+               "        text-decoration: none;\n" +
+               "    }\n" +
+               "\n" +
+               "    .pagination_section a:hover {\n" +
+               "        background-color: #f1f1f1;\n" +
+               "    }\n" +
+               "\n" +
+               "    .pagination_section .active {\n" +
+               "        background-color: #f1f1f1;\n" +
+               "    }\n" +
+               "</style>\n");
         out.println("</head>");
         out.println("<body>");
         out.println("<h1>Search Result</h1>");
