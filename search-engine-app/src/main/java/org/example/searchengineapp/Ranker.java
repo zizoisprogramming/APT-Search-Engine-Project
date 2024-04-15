@@ -3,39 +3,30 @@ package org.example.searchengineapp;
 import org.bson.Document;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+
 public class Ranker {
-    public List<WebPage> rank_documents(List<Document> relevant_docs)
+    public List<String> rank_documents(Set<Document> relevant_docs)
     {
         //takes list of mongodb documents(enteries of db)
         //returns list of ranked webpages
-        Map<WebPage, Integer> webpageScores = new HashMap<>();
+        //retrieve popularity of web pages
+        Map<String, Double> webpageScores = new HashMap<>();
         //giant loop and logic
 
         return  sortByScore(webpageScores);
 
 
     }
-    private List<WebPage> sortByScore(Map<WebPage,Integer> webPages)
+    public static List<String> sortByScore(Map<String,Double> urlScores)
     {
-        //convert map to list
-        List<Map.Entry<WebPage, Integer>> entryList = new ArrayList<>(webPages.entrySet());
-
-        // Sorting the entry list based on score (higher score comes 1st)
-        entryList.sort((entry1, entry2) -> entry2.getValue().compareTo(entry1.getValue()));
-
-        // list of the sorted webpages
-        List<WebPage> sortedWebpages = new ArrayList<>();
-
-        for (Map.Entry<WebPage, Integer> entry : entryList)
-        {
-            sortedWebpages.add(entry.getKey());
+        List<Map.Entry<String, Double>> entries = new ArrayList<>(urlScores.entrySet());
+        entries.sort(Map.Entry.comparingByValue(Comparator.reverseOrder()));
+        List<String> sortedKeys = new ArrayList<>();
+        for (String key : urlScores.keySet()) {
+            sortedKeys.add(key);
         }
-
-        return sortedWebpages;
+        return sortedKeys;
 
     }
 
@@ -97,4 +88,21 @@ public class Ranker {
             }
         }
     }
+
+    public static void  rank_by_popularity(Map<String,Double> urlScore)
+    {
+        connectWebPage DB=new connectWebPage();
+        DB.connection();
+
+        //loop on map urls and get popularity for each and add it to the scores
+        for (String key : urlScore.keySet()) {
+           Double p=DB.get_page_popularity(key); //get popularity from db
+           urlScore.put(key,urlScore.get(key)+p);
+        }
+    }
+    //TODO:setRelevantParagraph
+    //takes a map of webpage,score
+    //set webpage.body=relevant paragraph
+
+
 }

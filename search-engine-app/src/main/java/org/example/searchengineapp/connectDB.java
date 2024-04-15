@@ -8,7 +8,7 @@ import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import java.util.List;
 
-public class connectDB
+public class connectDB //indexer db
 {
     public MongoCollection<Document> connection()
     {

@@ -13,6 +13,8 @@ import org.bson.Document;
 
 import java.io.*;
 import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class QueryProcessor {
     private final MongoCollection<Document> collection;
@@ -20,7 +22,7 @@ public class QueryProcessor {
     private Map<PairSS,List<String>> TagPos= new HashMap<>(); //map[<word,url>]=list of tags
     private Map<String,Integer> DF=new HashMap<>();
     private  Map<PairSS,Double> TF=new HashMap<>();
-    private Map<String,Double> urlScore=new HashMap<>();
+    private Map<String,Double> urlScore=new HashMap<>(); //map each url to corresponding score
     private static Vector<String> StopWords = new Vector<String>();
 
 
@@ -82,14 +84,26 @@ public class QueryProcessor {
 
     public void mapping(Document doc,String word) throws JsonProcessingException
     {
-        List<Document> sec= (List<Document>) doc.get("url_list");
-        for(Document d1:sec)
+        List<Document> sec= (List<Document>) doc.get("url_list"); //list of url-lists of a single word
+        for(Document d1:sec) //loop on url-list
         {
             String url=d1.getString("_id");
-            urlScore.put(url,0.0);
-            Double n=d1.getDouble("tf");
+            //urlScore.put(url,0.0);
+            Double n=d1.getDouble("tf-idf");
+
+            //TODO:urlScore should be a map of <webPage object,score>
+            //TODO: implement&call function set_webPage(url) that returns webpage object carrying its data
+            //TODO: set_webPage should be in connectWebPage class
+            
+            /////////////TF-IDF directly in url-scores
+            // Add entry if key doesn't exist, or do nothing if already exists
+            urlScore.putIfAbsent(url, 0.0);
+            // Update
+            urlScore.put(url, urlScore.get(url) + n);
+            ////////////
+
             PairSS temp1=new PairSS(word,url);
-            TF.put(temp1,n);
+            //TF.put(temp1,n);
             List<Document> locs= (List<Document>) d1.get("loc");
             for (Document l:locs)
             {
@@ -112,24 +126,25 @@ public class QueryProcessor {
                 TagPos.put(temp1,psilist);
             }
         }
-        Integer val2 = doc.getInteger("count");
-        DF.put(word,val2);
+       // Integer val2 = doc.getInteger("count");
+        //DF.put(word,val2);
     }
-    public List<Document> filter_collection(MongoCollection<Document> collection, Set<String> query_words)
+    public Set<Document> filter_collection(MongoCollection<Document> collection, Set<String> query_words)
     {
-        // List to store the matching documents
-        List<Document> matchingDocs = new ArrayList<>();
+        // Set to store the matching documents (no duplicates)
+        Set<Document> matchingDocs = new HashSet<>();
 
         // Iterate over the words and collect documents matching
         for(String str : query_words)
         {
             Document result = collection.find(Filters.eq("_id", str)).first();
             if(result!=null)
-            {
+            { //result has the document with id=word
                 matchingDocs.add(result);
                 try {
                     mapping(result,str);
-                } catch (JsonProcessingException e) {
+                }
+                catch (JsonProcessingException e) {
                     throw new RuntimeException(e);
                 }
             }
@@ -145,8 +160,15 @@ public class QueryProcessor {
     public Set<String> process_query(String query)
     {
         Set<String> normalizedQuery=Normalize(query); //stemming
-        
-        List<Document> matching= filter_collection(collection,normalizedQuery);
+
+        //finds matching documents and maps them to tf-idf score
+        Set<Document> matching= filter_collection(collection,normalizedQuery);
+
+        //////debugging///////
+        System.out.println("initial score(tf-idf)");
+        printScoreMap();
+        //////////////////////////////
+
         System.out.println(urlScore.size());
         if(query.contains("\""))
         {
@@ -155,13 +177,47 @@ public class QueryProcessor {
         }
         System.out.println(urlScore.size());
 
-        System.out.println(urlScore);
-        ranker.rankbyTag(TagPos,urlScore);
-        System.out.println(urlScore);
+        ////debugging
+        System.out.println("before tag ranking");
+        printScoreMap();
+        //
 
-        List<WebPage> ranked_webPages=ranker.rank_documents(matching);
+        ranker.rankbyTag(TagPos,urlScore);
+
+        ////debugging
+        System.out.println("after tag ranking");
+        printScoreMap();
+        //
+
+        ranker.rank_by_popularity(urlScore);
+
+        ////debugging
+        System.out.println("after popularity ranking");
+        printScoreMap();
+        //
+        //TODO:this should be a list of webpages
+        //web pages are objects that carry url,body,title attributes
+
+        List<String> list=ranker.sortByScore(urlScore);
+
+        ////sorted
+        System.out.println("after sorting");
+        for (String item : list) {
+            System.out.println(item);
+        }
+        //
+
+
+
 
         //this should return list of ranked webPages
         return normalizedQuery;
+    }
+    private  void printScoreMap() //for debugging
+    {
+        for (String key : urlScore.keySet()) {
+            Double value = urlScore.get(key);
+            System.out.println("url: " + key + ", score: " + value);
+        }
     }
 }
