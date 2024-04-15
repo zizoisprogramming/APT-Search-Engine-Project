@@ -12,11 +12,12 @@ import java.util.Set;
 public class PhraseSearch
 {
     private final MongoCollection<Document> collection;
+    connectWebPage webpagesConnect = new connectWebPage();
+
 
     public PhraseSearch()
     {
-        connectWebPage c = new connectWebPage();
-        this.collection = c.connection();
+        this.collection = webpagesConnect.connection();
     }
     public void phraseSearch(String query, Map<String,Double> urlScore)
     {
@@ -24,8 +25,9 @@ public class PhraseSearch
         List<String> toberemoved=new ArrayList<>();
         for (Map.Entry<String, Double> entry : urlScore.entrySet())
         {
-            Document result = collection.find(Filters.eq("url", entry.getKey())).first();
-            if(result!=null) {
+            Document result = webpagesConnect.find(entry.getKey());
+            if(result!=null)
+            {
                 String body = result.getString("body");
                 if (!body.contains(query))
                 {

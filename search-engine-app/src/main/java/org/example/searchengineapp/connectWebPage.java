@@ -20,7 +20,7 @@ public class connectWebPage
         System.out.println("Created Mongo Connection successfully");
 
         MongoDatabase db = mongoClient.getDatabase("webPages");
-        collection= db.getCollection("webPages_collection");
+        collection= db.getCollection("dum");
 
         return collection;
     }
@@ -42,12 +42,27 @@ public class connectWebPage
            return 0.0;
         }
     }
+    public Document find(String url)
+    {
+        // Create a filter to match documents with the specified URL
+        Document filter = new Document("url", url);
+
+        // Find the document with the specified URL
+        Document result = collection.find(filter).first();
+        return  result;
+    }
     public List<WebPage> getWebPages(Map<String,Double> urls)
     {
         List<WebPage> result=new ArrayList<>();
         for(Map.Entry<String,Double> url:urls.entrySet())
         {
-            Document doc=collection.find(Filters.eq("url",url.getKey())).first();
+            // Create a filter to match documents with the specified URL
+//            Document filter = new Document("url", url.getKey());
+
+            // Find the document with the specified URL
+            Document doc = find(url.getKey());
+            System.out.println(url.getKey());
+            System.out.println(doc);
             if(doc!=null)
             {
                 String title = doc.getString("title");

@@ -204,6 +204,7 @@ public class QueryProcessor {
         {
             System.out.println(wp.getTitle());
         }
+        System.out.println(rankedWebPages.size());
 
         //sort
         Collections.sort(rankedWebPages);
@@ -214,6 +215,11 @@ public class QueryProcessor {
         {
             System.out.println(wp.getTitle());
             System.out.println(wp.getScore());
+        }
+
+        for(WebPage wp:rankedWebPages)
+        {
+            ranker.setRelevantParagraph(wp,query);
         }
 
         //this should return list of ranked webPages
