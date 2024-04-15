@@ -3,7 +3,12 @@ package org.example.searchengineapp;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Filters;
 import org.bson.Document;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class connectWebPage
 {
@@ -36,5 +41,21 @@ public class connectWebPage
             // Document not found
            return 0.0;
         }
+    }
+    public List<WebPage> getWebPages(Map<String,Double> urls)
+    {
+        List<WebPage> result=new ArrayList<>();
+        for(Map.Entry<String,Double> url:urls.entrySet())
+        {
+            Document doc=collection.find(Filters.eq("url",url.getKey())).first();
+            if(doc!=null)
+            {
+                String title = doc.getString("title");
+                String body = doc.getString("body");
+                WebPage temp = new WebPage(url.getKey(), body, title,url.getValue());
+                result.add(temp);
+            }
+        }
+        return  result;
     }
 }

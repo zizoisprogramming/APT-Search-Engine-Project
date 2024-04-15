@@ -4,9 +4,10 @@ import org.bson.Document;
 
 import java.net.URL;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Ranker {
-    public List<String> rank_documents(Set<Document> relevant_docs)
+    public Set<String> rank_documents(Set<Document> relevant_docs)
     {
         //takes list of mongodb documents(enteries of db)
         //returns list of ranked webpages
@@ -18,16 +19,17 @@ public class Ranker {
 
 
     }
-    public static List<String> sortByScore(Map<String,Double> urlScores)
+    public static Set<String> sortByScore(Map<String,Double> urlScores)
     {
         List<Map.Entry<String, Double>> entries = new ArrayList<>(urlScores.entrySet());
         entries.sort(Map.Entry.comparingByValue(Comparator.reverseOrder()));
         List<String> sortedKeys = new ArrayList<>();
-        for (String key : urlScores.keySet()) {
+        for (String key : urlScores.keySet())
+        {
             sortedKeys.add(key);
         }
-        return sortedKeys;
 
+        return urlScores.keySet();
     }
 
     public void rankbyTag(Map<PairSS,List<String>> TagPos,Map<String,Double> urlScores)

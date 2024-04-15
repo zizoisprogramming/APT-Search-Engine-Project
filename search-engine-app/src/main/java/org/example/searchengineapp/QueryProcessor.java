@@ -24,7 +24,7 @@ public class QueryProcessor {
     private  Map<PairSS,Double> TF=new HashMap<>();
     private Map<String,Double> urlScore=new HashMap<>(); //map each url to corresponding score
     private static Vector<String> StopWords = new Vector<String>();
-
+    private connectWebPage webpageConnect= new connectWebPage();
 
     public QueryProcessor()
     {
@@ -88,11 +88,11 @@ public class QueryProcessor {
         for(Document d1:sec) //loop on url-list
         {
             String url=d1.getString("_id");
-            //urlScore.put(url,0.0);
             Double n=d1.getDouble("tf-idf");
 
             //TODO:urlScore should be a map of <webPage object,score>
             //TODO: implement&call function set_webPage(url) that returns webpage object carrying its data
+//            WebPage wp=getWebPage(url);
             //TODO: set_webPage should be in connectWebPage class
             
             /////////////TF-IDF directly in url-scores
@@ -198,17 +198,23 @@ public class QueryProcessor {
         //TODO:this should be a list of webpages
         //web pages are objects that carry url,body,title attributes
 
-        List<String> list=ranker.sortByScore(urlScore);
+        List<WebPage> rankedWebPages=webpageConnect.getWebPages(urlScore);
+
+        for(WebPage wp:rankedWebPages)
+        {
+            System.out.println(wp.getTitle());
+        }
+
+        //sort
+        Collections.sort(rankedWebPages);
 
         ////sorted
         System.out.println("after sorting");
-        for (String item : list) {
-            System.out.println(item);
+        for(WebPage wp:rankedWebPages)
+        {
+            System.out.println(wp.getTitle());
+            System.out.println(wp.getScore());
         }
-        //
-
-
-
 
         //this should return list of ranked webPages
         return normalizedQuery;
