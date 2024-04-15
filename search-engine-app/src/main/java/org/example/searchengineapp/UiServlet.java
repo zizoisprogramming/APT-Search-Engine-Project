@@ -42,9 +42,14 @@ public class UiServlet extends HttpServlet {
         out.println("<html>");
         out.println("<head>");
         out.println("<title>Search Result</title>");
-       out.println("<style>\n" +
-               "    body {\n" +
-               "        font-family: Arial, sans-serif;\n" +
+       out.println("<style>\n");
+        out.println("form {text-align: center;margin-top: 50px;}");
+        out.println("input[type=\"text\"] {width: 300px;padding: 10px;border-radius: 5px;border: 1px solid #ccc;font-size: 16px;}\n");
+        out.println("button[type=\"submit\"] {padding: 10px 20px;background-color: #4CAF50;color: white;border: none;border-radius: 5px;cursor: pointer;font-size: 16px;}\n");
+        out.println("button[type=\"submit\"]:hover {background-color: #45a049;}\n");
+
+        out.println("    body {\n"+
+                "        font-family: Arial, sans-serif;\n" +
                "        background-color: #f2f2f2;\n" +
                "        margin: 0;\n" +
                "        padding: 20px;\n" +
@@ -127,6 +132,10 @@ public class UiServlet extends HttpServlet {
         out.println("</head>");
         out.println("<body>");
         out.println("<h1>Search Result</h1>");
+        out.println("<form action=\"ui-servlet\" method=\"get\">");
+        out.println("Enter your query: <input type=\"text\" name=\"query\">");
+        out.println("<button type=\"submit\">Submit</button>");
+        out.println("</form>");
         out.println("<p>Query: " + query + "</p>");
 
         for (int i=startIndex;i<endIndex;i++)
