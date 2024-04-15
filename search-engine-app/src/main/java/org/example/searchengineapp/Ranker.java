@@ -122,13 +122,16 @@ public class Ranker {
         else
         {
             String[] words=text.split(" ");
+            index=stem(wp.getBody().toLowerCase(),words);
+//            String stemmedBody=stem(wp.getBody().toLowerCase());
 //            PorterStemmer obj=new PorterStemmer();
-            for(String str:words)
-            {
+//            for(String str:words)
+//            {
 //                String stemmed = obj.stem(str);
-                if(wp.getBody().toLowerCase().indexOf(str.toLowerCase())>0)
-                    index=wp.getBody().toLowerCase().indexOf(str.toLowerCase());
-            }
+//                System.out.println(stemmed);
+//                if(stemmedBody.indexOf(stemmed)>0)
+//                    index=stemmedBody.indexOf(stemmed);
+//            }
         }
         System.out.println(index);
         Integer start=0,end=0;
@@ -151,5 +154,25 @@ public class Ranker {
         String relevantParagraph=wp.getBody().substring(start,end)+"...";
         wp.setBody(relevantParagraph);
 //        System.out.println(relevantParagraph);
+    }
+
+    private Integer stem(String body,String[] words)
+    {
+        Integer index=0;
+        String[] bodyWords=body.split(" ");
+        PorterStemmer obj=new PorterStemmer();
+        for(String str:words)
+        {
+            String stemmed = obj.stem(str);
+            for(int i=0;i<bodyWords.length;i++)
+            {
+                if(obj.stem(bodyWords[i]).equals(stemmed))
+                {
+                    System.out.println("found");
+                    return body.indexOf(bodyWords[i]);
+                }
+            }
+        }
+        return index;
     }
 }
