@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.google.gson.Gson;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
 
@@ -12,166 +13,184 @@ import jakarta.servlet.annotation.*;
 public class UiServlet extends HttpServlet {
     private String message;
     private QueryProcessor q;
+    private  queries_db queryDB;
 
     public void init() {
 
         q=new QueryProcessor();
+        queryDB=new queries_db();
     }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String query=request.getParameter("query");
-        long startTime = System.currentTimeMillis();
+        String partialQuery = request.getParameter("partialQuery");
+        if (partialQuery != null && !partialQuery.isEmpty()) {
+            // Fetch suggestions based on partial query
+            List<String> suggestions = queryDB.get_suggestions(partialQuery);
+            // Convert suggestions to JSON
+            String json = new Gson().toJson(suggestions);
+            // Set response content type and write JSON response
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().write(json);
+        } else {
+            String query = request.getParameter("query");
+            long startTime = System.currentTimeMillis();
+            queryDB.store_query(query);
 
-        int page=1;
-        if(request.getParameter("page")!=null)
-        {
-            page = Integer.parseInt(request.getParameter("page")); // Get the requested page number
-        }
-        int resultsPerPage = 10; // Number of results per page
+            int page = 1;
+            if (request.getParameter("page") != null) {
+                page = Integer.parseInt(request.getParameter("page")); // Get the requested page number
+            }
+            int resultsPerPage = 10; // Number of results per page
 
 
-        response.setContentType("text/html");
+            response.setContentType("text/html");
 
-        List<WebPage> result=q.process_query(query);
+            List<WebPage> result = q.process_query(query);
 
-        // Calculate the starting index and ending index for the current page
-        int startIndex = (page - 1) * resultsPerPage;
-        int endIndex = Math.min(startIndex + resultsPerPage, result.size());
-        long endTime = System.currentTimeMillis();
-        long elapsedTime = endTime - startTime;
+            // Calculate the starting index and ending index for the current page
+            int startIndex = (page - 1) * resultsPerPage;
+            int endIndex = Math.min(startIndex + resultsPerPage, result.size());
+            long endTime = System.currentTimeMillis();
+            long elapsedTime = endTime - startTime;
 
-        // Hello
-        PrintWriter out = response.getWriter();
-        // Write HTML response with styling
-        out.println("<!DOCTYPE html>");
-        out.println("<html>");
-        out.println("<head>");
-        out.println("<title>Search Result</title>");
-       out.println("<style>\n");
-        out.println("form {text-align: center;margin-top: 50px;}");
-        out.println("input[type=\"text\"] {width: 300px;padding: 10px;border-radius: 5px;border: 1px solid #ccc;font-size: 16px;}\n");
-        out.println("button[type=\"submit\"] {padding: 10px 20px;background-color: #4CAF50;color: white;border: none;border-radius: 5px;cursor: pointer;font-size: 16px;}\n");
-        out.println("button[type=\"submit\"]:hover {background-color: #45a049;}\n");
+            // Hello
+            PrintWriter out = response.getWriter();
+            // Write HTML response with styling
+            out.println("<!DOCTYPE html>");
+            out.println("<html>");
+            out.println("<head>");
+            out.println("<title>Search Result</title>");
+            out.println("<style>\n");
+            out.println("form {text-align: center;margin-top: 50px;}");
+            out.println("input[type=\"text\"] {width: 300px;padding: 10px;border-radius: 5px;border: 1px solid #ccc;font-size: 16px;}\n");
+            out.println("button[type=\"submit\"] {padding: 10px 20px;background-color: #4CAF50;color: white;border: none;border-radius: 5px;cursor: pointer;font-size: 16px;}\n");
+            out.println("button[type=\"submit\"]:hover {background-color: #45a049;}\n");
 
-        out.println("    body {\n"+
-                "        font-family: Arial, sans-serif;\n" +
-               "        background-color: #f2f2f2;\n" +
-               "        margin: 0;\n" +
-               "        padding: 20px;\n" +
-               "    }\n" +
-               "\n" +
-               "    h1 {\n" +
-               "        color: #1a0dab;\n" +
-               "        text-align: center;\n" +
-               "    }\n" +
-               "\n" +
-               "    h4 {\n" +
-               "        color: #1a0dab;\n" +
-               "        margin: 0;\n" +
-               "        padding: 0;\n" +
-               "        font-size: 18px;\n" +
-               "        margin-bottom: 5px;\n" +
-               "    }\n" +
-               "\n" +
-               "    p {\n" +
-               "        margin: 0;\n" +
-               "        padding: 0;\n" +
-               "        font-size: 14px;\n" +
-               "        color: #4d5156;\n" +
-               "    }\n" +
-               "\n" +
-               "    a {\n" +
-               "        color: #1a0dab;\n" +
-               "        text-decoration: none;\n" +
-               "    }\n" +
-               "\n" +
-               "    .result {\n" +
-               "        margin: 20px 0;\n" +
-               "        padding: 10px;\n" +
-               "        background-color: #fff;\n" +
-               "        border-radius: 8px;\n" +
-               "        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);\n" +
-               "    }\n" +
-               "\n" +
-               "    .result:hover {\n" +
-               "        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);\n" +
-               "    }\n" +
-               "\n" +
-               "    .result a {\n" +
-               "        font-size: 14px;\n" +
-               "        color: #1a0dab;\n" +
-               "    }\n" +
-               "\n" +
-               "    .result a:hover {\n" +
-               "        text-decoration: underline;\n" +
-               "    }\n" +
-               "\n" +
-               "    .highlight {\n" +
-               "        background-color: #ffa;\n" +
-               "    }\n" +
-               "\n" +
-               "    .pagination_section {\n" +
-               "        display: flex;\n" +
-               "        justify-content: center;\n" +
-               "        align-items: center;\n" +
-               "        margin-top: 20px;\n" +
-               "    }\n" +
-               "\n" +
-               "    .pagination_section a {\n" +
-               "        color: #1a0dab;\n" +
-               "        padding: 5px 10px;\n" +
-               "        margin: 0 5px;\n" +
-               "        border: 1px solid #dadce0;\n" +
-               "        border-radius: 2px;\n" +
-               "        text-decoration: none;\n" +
-               "    }\n" +
-               "\n" +
-               "    .pagination_section a:hover {\n" +
-               "        background-color: #f1f1f1;\n" +
-               "    }\n" +
-               "\n" +
-               "    .pagination_section .active {\n" +
-               "        background-color: #f1f1f1;\n" +
-               "    }\n" +
-               "</style>\n");
-        out.println("</head>");
-        out.println("<body>");
-        out.println("<h1>Search Result</h1>");
+            out.println("    body {\n" +
+                    "        font-family: Arial, sans-serif;\n" +
+                    "        background-color: #f2f2f2;\n" +
+                    "        margin: 0;\n" +
+                    "        padding: 20px;\n" +
+                    "    }\n" +
+                    "\n" +
+                    "    h1 {\n" +
+                    "        color: #1a0dab;\n" +
+                    "        text-align: center;\n" +
+                    "    }\n" +
+                    "\n" +
+                    "    h4 {\n" +
+                    "        color: #1a0dab;\n" +
+                    "        margin: 0;\n" +
+                    "        padding: 0;\n" +
+                    "        font-size: 18px;\n" +
+                    "        margin-bottom: 5px;\n" +
+                    "    }\n" +
+                    "\n" +
+                    "    p {\n" +
+                    "        margin: 0;\n" +
+                    "        padding: 0;\n" +
+                    "        font-size: 14px;\n" +
+                    "        color: #4d5156;\n" +
+                    "    }\n" +
+                    "\n" +
+                    "    a {\n" +
+                    "        color: #1a0dab;\n" +
+                    "        text-decoration: none;\n" +
+                    "    }\n" +
+                    "\n" +
+                    "    .result {\n" +
+                    "        margin: 20px 0;\n" +
+                    "        padding: 10px;\n" +
+                    "        background-color: #fff;\n" +
+                    "        border-radius: 8px;\n" +
+                    "        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);\n" +
+                    "    }\n" +
+                    "\n" +
+                    "    .result:hover {\n" +
+                    "        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);\n" +
+                    "    }\n" +
+                    "\n" +
+                    "    .result a {\n" +
+                    "        font-size: 14px;\n" +
+                    "        color: #1a0dab;\n" +
+                    "    }\n" +
+                    "\n" +
+                    "    .result a:hover {\n" +
+                    "        text-decoration: underline;\n" +
+                    "    }\n" +
+                    "\n" +
+                    "    .highlight {\n" +
+                    "        background-color: #ffa;\n" +
+                    "    }\n" +
+                    "\n" +
+                    "    .pagination_section {\n" +
+                    "        display: flex;\n" +
+                    "        justify-content: center;\n" +
+                    "        align-items: center;\n" +
+                    "        margin-top: 20px;\n" +
+                    "    }\n" +
+                    "\n" +
+                    "    .pagination_section a {\n" +
+                    "        color: #1a0dab;\n" +
+                    "        padding: 5px 10px;\n" +
+                    "        margin: 0 5px;\n" +
+                    "        border: 1px solid #dadce0;\n" +
+                    "        border-radius: 2px;\n" +
+                    "        text-decoration: none;\n" +
+                    "    }\n" +
+                    "\n" +
+                    "    .pagination_section a:hover {\n" +
+                    "        background-color: #f1f1f1;\n" +
+                    "    }\n" +
+                    "\n" +
+                    "    .pagination_section .active {\n" +
+                    "        background-color: #f1f1f1;\n" +
+                    "    }\n" +
+                    "</style>\n");
+            out.println("</head>");
+            out.println("<body>");
+            out.println("<h1>Search Result</h1>");
 
-        out.println("<form action=\"ui-servlet\" method=\"get\">");
-        query=query.replaceAll("\"","");
-        out.println("Enter your query: <input type=\"text\" name=\"query\" value=\""+query+"\">");
-        out.println("<button type=\"submit\">Submit</button>");
-        out.println("</form>");
+            // Output search box
+            query=query.replaceAll("\"","");
+            out.println("<div>");
+            out.println("<div class=\"autocomplete\">");
+            out.println("<form action=\"ui-servlet\" method=\"get\">");
+            out.println("<input type=\"text\" id=\"queryInput\" name=\"query\" placeholder=\"Enter your query...\" autocomplete=\"off\">");
+            out.println("<div id=\"autocompleteDropdown\" class=\"autocomplete-content\"></div>");
+            out.println("<button type=\"submit\">Submit</button>");
+            out.println("</form>");
+            out.println("</div>");
+            out.println("</div>");
 
-        out.println("<p>Elapsed Time: " + elapsedTime+" milliseconds "+result.size()+" results</p>");
+            out.println("<p>Elapsed Time: " + elapsedTime + " milliseconds " + result.size() + " results</p>");
 //        out.println("<p>Query: " + query + "</p>");
 
-        for (int i=startIndex;i<endIndex;i++)
-        {
-            WebPage wp=result.get(i);
-            String body_html=formatbody(wp.getBody(),query);
-            out.println("<div class=\"result\">");
-            out.println("<h4>Title: " + wp.getTitle() + "</h4>");
-            out.println("<a href=\""+wp.getUrl()+"\">Url: " + wp.getUrl() + "</a>");
-            out.println(body_html);
-            out.println("</div>" );
+            for (int i = startIndex; i < endIndex; i++) {
+                WebPage wp = result.get(i);
+                String body_html = formatbody(wp.getBody(), query);
+                out.println("<div class=\"result\">");
+                out.println("<h4>Title: " + wp.getTitle() + "</h4>");
+                out.println("<a href=\"" + wp.getUrl() + "\">Url: " + wp.getUrl() + "</a>");
+                out.println(body_html);
+                out.println("</div>");
+
+            }
+            // Generate pagination links
+            int totalPages = (int) Math.ceil((double) result.size() / resultsPerPage);
+            out.println("<div class=\"pagination_section\">");
+            for (int i = 1; i <= totalPages; i++) {
+                out.println("<a href=\"?query=" + query + "&page=" + i + "\">Page " + i + "</a>");
+            }
+            out.println("</div>");
+
+            out.println("</body>");
+            out.println("</html>");
+            q.clean_up();
+
 
         }
-        // Generate pagination links
-        int totalPages = (int) Math.ceil((double) result.size() / resultsPerPage);
-        out.println("<div class=\"pagination_section\">");
-        for (int i = 1; i <= totalPages; i++)
-        {
-            out.println("<a href=\"?query=" + query + "&page=" + i + "\">Page " + i + "</a>");
-        }
-        out.println("</div>" );
-
-        out.println("</body>");
-        out.println("</html>");
-        q.clean_up();
-
-
     }
     private String formatbody(String body,String query)
     {
@@ -201,7 +220,10 @@ public class UiServlet extends HttpServlet {
         htmlOutput.append("</p>");
         return htmlOutput.toString();
     }
+
+
     public void destroy() {
+        queryDB.close();
     }
 
 }
