@@ -77,7 +77,11 @@ public class UiServlet extends HttpServlet {
                     "    h1 {\n" +
                     "        color: #1a0dab;\n" +
                     "        text-align: center;\n" +
+                    " margin:20px;" +
                     "    }\n" +
+                    "form{" +
+                    "padding:5px;" +
+                    "margin:5px;}" +
                     "\n" +
                     "    h4 {\n" +
                     "        color: #1a0dab;\n" +
@@ -148,6 +152,107 @@ public class UiServlet extends HttpServlet {
                     "        background-color: #f1f1f1;\n" +
                     "    }\n" +
                     "</style>\n");
+            out.println("<style>\n" +
+                    "    body {\n" +
+                    "      font-family: Arial, sans-serif;\n" +
+                    "      background-color: #f2f2f2;\n" +
+                    "      margin: 0;\n" +
+                    "      padding: 0;\n" +
+                    "    }\n" +
+                    "    h1 {\n" +
+                    "      color: #333;\n" +
+                    "      text-align: center;\n" +
+                    "    }\n" +
+                    "    .container {\n" +
+                    "      display: flex;\n" +
+                    "      justify-content: center; /* Center horizontally */\n" +
+                    "      align-items: flex-start; /* Align to the top */\n" +
+                    "      padding: 20px; /* Add some padding */\n" +
+                    "    }\n" +
+                    "    form {\n" +
+                    "      text-align: center;\n" +
+                    "    }\n" +
+                    "    input[type=\"text\"] {\n" +
+                    "      width: 300px;\n" +
+                    "      padding: 10px;\n" +
+                    "      border-radius: 5px;\n" +
+                    "      border: 1px solid #ccc;\n" +
+                    "      font-size: 16px;\n" +
+                    "      text-align: center; /* Center the text */\n" +
+                    "    }\n" +
+                    "    button[type=\"submit\"] {\n" +
+                    "      margin-left: 10px; /* Add some space between input and button */\n" +
+                    "      padding: 10px 20px;\n" +
+                    "      background-color: #4CAF50;\n" +
+                    "      color: white;\n" +
+                    "      border: none;\n" +
+                    "      border-radius: 5px;\n" +
+                    "      cursor: pointer;\n" +
+                    "      font-size: 16px;\n" +
+                    "    }\n" +
+                    "    button[type=\"submit\"]:hover {\n" +
+                    "      background-color: #45a049;\n" +
+                    "    }\n" +
+                    "    /* Autocomplete styles */\n" +
+                    "    .autocomplete {\n" +
+                    "      position: relative;\n" +
+                    "      display: inline-block;\n" +
+                    "    }\n" +
+                    "    .autocomplete-content {\n" +
+                    "      display: none;\n" +
+                    "      position: absolute;\n" +
+                    "      background-color: #f9f9f9;\n" +
+                    "      min-width: 300px;\n" +
+                    "      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);\n" +
+                    "      z-index: 1;\n" +
+                    "    }\n" +
+                    "    .autocomplete-content a {\n" +
+                    "      color: black;\n" +
+                    "      padding: 12px 16px;\n" +
+                    "      text-decoration: none;\n" +
+                    "      display: block;\n" +
+                    "    }\n" +
+                    "    .autocomplete-content a:hover {\n" +
+                    "      background-color: #f1f1f1;\n" +
+                    "    }\n" +
+                    "  </style>");
+            out.println("<script src=\"https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js\"></script>");
+            out.println("<script>");
+            out.println("$(document).ready(function() {");
+            out.println("$('#queryInput').on('input', function() {");
+            out.println("var partialQuery = $(this).val();");
+
+            out.println("if (partialQuery.trim().length === 0) {");
+
+            out.println("$('#autocompleteDropdown').hide();");
+            out.println("return;");
+            out.println("}");
+            out.println("$.ajax({");
+            out.println("url: 'ui-servlet',");
+            out.println("method: 'GET',");
+            out.println("data: { partialQuery: partialQuery },");
+            out.println("success: function(data) {");
+            out.println("var autocompleteContent = $('#autocompleteContent');");
+            out.println("autocompleteContent.empty();");
+            out.println("data.forEach(function(suggestion) {");
+            out.println("autocompleteContent.append('<a href=\"#\" onclick=\"selectSuggestion(\\'' + suggestion + '\\')\">' + suggestion + '</a>');");
+
+            out.println("});");
+            out.println("if (data.length > 0) {");
+
+            out.println("$('#autocompleteDropdown').show();");
+            out.println("} else {");
+            out.println("$('#autocompleteDropdown').hide();");
+            out.println("}");
+            out.println("}");
+            out.println("});");
+            out.println("});");
+            out.println("});");
+            out.println("function selectSuggestion(suggestion) {");
+            out.println("$('#queryInput').val(suggestion);");
+            out.println("$('#autocompleteDropdown').hide();");
+            out.println("}");
+            out.println("</script>");
             out.println("</head>");
             out.println("<body>");
             out.println("<h1>Search Result</h1>");
@@ -157,8 +262,11 @@ public class UiServlet extends HttpServlet {
             out.println("<div>");
             out.println("<div class=\"autocomplete\">");
             out.println("<form action=\"ui-servlet\" method=\"get\">");
-            out.println("<input type=\"text\" id=\"queryInput\" name=\"query\" placeholder=\"Enter your query...\" autocomplete=\"off\">");
-            out.println("<div id=\"autocompleteDropdown\" class=\"autocomplete-content\"></div>");
+            out.println("<input type=\"text\" id=\"queryInput\" name=\"query\" value=\""+query+"\" placeholder=\"Enter your query...\" autocomplete=\"off\">");
+            out.println("<div id=\"autocompleteDropdown\" class=\"autocomplete-content\">");
+            out.println("<div id=\"autocompleteContent\"></div>");
+            out.println("</div>");
+
             out.println("<button type=\"submit\">Submit</button>");
             out.println("</form>");
             out.println("</div>");
@@ -188,8 +296,6 @@ public class UiServlet extends HttpServlet {
             out.println("</body>");
             out.println("</html>");
             q.clean_up();
-
-
         }
     }
     private String formatbody(String body,String query)
