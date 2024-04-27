@@ -258,11 +258,13 @@ public class UiServlet extends HttpServlet {
             out.println("<h1>Search Result</h1>");
 
             // Output search box
-            query=query.replaceAll("\"","");
+            query=query.replaceAll("\"","\\\"");
+//            System.out.println("value=\'"+temp+"\'");
+
             out.println("<div>");
             out.println("<div class=\"autocomplete\">");
             out.println("<form action=\"ui-servlet\" method=\"get\">");
-            out.println("<input type=\"text\" id=\"queryInput\" name=\"query\" value=\""+query+"\" placeholder=\"Enter your query...\" autocomplete=\"off\">");
+            out.println("<input type=\"text\" id=\"queryInput\" name=\"query\" value=\'"+query+"\' placeholder=\"Enter your query...\" autocomplete=\"off\">");
             out.println("<div id=\"autocompleteDropdown\" class=\"autocomplete-content\">");
             out.println("<div id=\"autocompleteContent\"></div>");
             out.println("</div>");
@@ -288,8 +290,9 @@ public class UiServlet extends HttpServlet {
             // Generate pagination links
             int totalPages = (int) Math.ceil((double) result.size() / resultsPerPage);
             out.println("<div class=\"pagination_section\">");
+            System.out.println(query);
             for (int i = 1; i <= totalPages; i++) {
-                out.println("<a href=\"?query=" + query + "&page=" + i + "\">Page " + i + "</a>");
+                out.println("<a href=\'?query=" + query + "&page=" + i + "\'>Page " + i + "</a>");
             }
             out.println("</div>");
 

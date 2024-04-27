@@ -57,7 +57,7 @@ public class QueryProcessor {
         PorterStemmer obj=new PorterStemmer();
         for(String str:words)
         {
-            if(!StopWords.contains(str))
+            if(!StopWords.contains(str.toLowerCase()))
             {
                 String stemmed = obj.stem(str);
                 stemmedWords.add(stemmed.toLowerCase());
@@ -109,7 +109,7 @@ public class QueryProcessor {
             {
                 Set<String> taglist=l.keySet();
                 String tag=taglist.iterator().next();
-                System.out.println(tag);
+//                System.out.println(tag);
 //                Integer p=l.getInteger("pos");
 //                PairSI temp=new PairSI(tag,p);
 
@@ -140,7 +140,7 @@ public class QueryProcessor {
             Document result = collection.find(Filters.eq("_id", str)).first();
             if(result!=null)
             { //result has the document with id=word
-                System.out.println("found matching doc for word "+str+"doc is"+result);
+                System.out.println("found matching doc for word "+str+"doc is");
                 matchingDocs.add(result);
                 try {
                     mapping(result,str);
@@ -155,9 +155,9 @@ public class QueryProcessor {
             }
         }
         // Print or process the matching documents
-        for (Document matchingDoc : matchingDocs) { //for debugging
-            System.out.println(matchingDoc.toJson());
-        }
+//        for (Document matchingDoc : matchingDocs) { //for debugging
+//            System.out.println(matchingDoc.toJson());
+//        }
         return matchingDocs;
 
     }
@@ -165,66 +165,84 @@ public class QueryProcessor {
     public List<WebPage> process_query(String query)
     {
         Set<String> normalizedQuery=Normalize(query); //stemming
+        System.out.println("normalized");
+        System.out.println(normalizedQuery);
 
         //finds matching documents and maps them to tf-idf score
         Set<Document> matching= filter_collection(collection,normalizedQuery);
 
         //////debugging///////
-        System.out.println("initial score(tf-idf)");
-        printScoreMap();
+//        System.out.println("initial score(tf-idf)");
+//        printScoreMap();
         //////////////////////////////
 
-        System.out.println(urlScore.size());
+//        System.out.println(urlScore.size());
         if(query.contains("\""))
         {
+            System.out.println("start phrasing");
             PhraseSearch phrasing=new PhraseSearch();
-            phrasing.phraseSearch(query,urlScore);
+            if(query.contains("OR")||query.contains("AND"))
+            {
+                System.out.println(urlScore.size());
+                phrasing.bonus(query,urlScore);
+                System.out.println(urlScore.size());
+            }
+            else
+            {
+                phrasing.phraseSearch(query,urlScore);
+            }
         }
-        System.out.println(urlScore.size());
+//        System.out.println(urlScore.size());
 
         ////debugging
-        System.out.println("before tag ranking");
-        printScoreMap();
+//        System.out.println("before tag ranking");
+//        printScoreMap();
         //
 
         ranker.rankbyTag(TagPos,urlScore);
 
         ////debugging
-        System.out.println("after tag ranking");
-        printScoreMap();
+//        System.out.println("after tag ranking");
+//        printScoreMap();
         //
 
         ranker.rank_by_popularity(urlScore);
 
         ////debugging
-        System.out.println("after popularity ranking");
-        printScoreMap();
+//        System.out.println("after popularity ranking");
+//        printScoreMap();
         //
         //TODO:this should be a list of webpages
         //web pages are objects that carry url,body,title attributes
 
         List<WebPage> rankedWebPages=webpageConnect.getWebPages(urlScore);
 
-        for(WebPage wp:rankedWebPages)
-        {
-            System.out.println(wp.getTitle());
-        }
-        System.out.println(rankedWebPages.size());
+//        for(WebPage wp:rankedWebPages)
+//        {
+//            System.out.println(wp.getTitle());
+//        }
+//        System.out.println(rankedWebPages.size());
 
         //sort
         Collections.sort(rankedWebPages);
 
         ////sorted
-        System.out.println("after sorting");
+//        System.out.println("after sorting");
+//        for(WebPage wp:rankedWebPages)
+//        {
+//            System.out.println(wp.getTitle());
+//            System.out.println(wp.getScore());
+//        }
+//
         for(WebPage wp:rankedWebPages)
         {
-            System.out.println(wp.getTitle());
-            System.out.println(wp.getScore());
-        }
-
-        for(WebPage wp:rankedWebPages)
-        {
-            ranker.setRelevantParagraph(wp,query);
+            if(query.contains("\"")&&(query.contains("AND")||query.contains("OR")))
+            {
+                System.out.println("BONUS");
+                ranker.bonusParagraph(wp,query);
+            }
+            else
+                ranker.setRelevantParagraph(wp,query);
         }
 
         //this should return list of ranked webPages

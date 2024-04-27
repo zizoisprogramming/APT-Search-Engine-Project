@@ -61,8 +61,8 @@ public class connectWebPage
 
             // Find the document with the specified URL
             Document doc = find(url.getKey());
-            System.out.println(url.getKey());
-            System.out.println(doc);
+//            System.out.println(url.getKey());
+//            System.out.println(doc);
             if(doc!=null)
             {
                 String title = doc.getString("title");
