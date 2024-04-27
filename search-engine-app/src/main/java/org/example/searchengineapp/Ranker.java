@@ -191,7 +191,7 @@ public class Ranker {
         PorterStemmer obj=new PorterStemmer();
         for(String str:words)
         {
-            String stemmed = obj.stem(str);
+            String stemmed = obj.stem(str).toLowerCase();
             for(int i=0;i<bodyWords.length;i++)
             {
                 if(obj.stem(bodyWords[i]).equals(stemmed))
