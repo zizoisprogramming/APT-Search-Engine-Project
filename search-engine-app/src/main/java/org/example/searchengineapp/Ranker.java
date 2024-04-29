@@ -117,7 +117,7 @@ public class Ranker {
         Integer index=0;
         if(phrasing)
         {
-            index=wp.getBody().toLowerCase().indexOf(text.toLowerCase());
+            index=wp.getBody().toLowerCase().indexOf(" "+text.toLowerCase()+" ");
         }
         else
         {
@@ -149,7 +149,20 @@ public class Ranker {
 
     public void bonusParagraph(WebPage wp,String query)
     {
-        String[] phrases= query.replaceAll("\"","").split("\\s+AND\\s+|\\s+OR\\s+");
+        String processedQuery=query;
+        while(processedQuery.contains("NOT"))
+        {
+            int indexNot=processedQuery.indexOf("NOT");
+            String temp=processedQuery.substring(indexNot+5);
+            int lastindex=temp.indexOf("\"");
+            StringBuilder sb = new StringBuilder(processedQuery);
+            if (indexNot != -1) {
+                sb.delete(indexNot, indexNot+6 + lastindex);
+            }
+            processedQuery = sb.toString();
+        }
+
+        String[] phrases= processedQuery.trim().replaceAll("\"","").split("\\s+AND\\s+|\\s+OR\\s+");
         Integer index=0;
         for(String phrase:phrases)
         {

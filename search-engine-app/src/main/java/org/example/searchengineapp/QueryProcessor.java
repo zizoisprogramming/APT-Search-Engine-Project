@@ -181,7 +181,7 @@ public class QueryProcessor {
         {
             System.out.println("start phrasing");
             PhraseSearch phrasing=new PhraseSearch();
-            if(query.contains("OR")||query.contains("AND"))
+            if(query.contains("OR")||query.contains("AND")||query.contains("NOT"))
             {
                 System.out.println(urlScore.size());
                 phrasing.bonus(query,urlScore);
@@ -236,7 +236,7 @@ public class QueryProcessor {
 //
         for(WebPage wp:rankedWebPages)
         {
-            if(query.contains("\"")&&(query.contains("AND")||query.contains("OR")))
+            if(query.contains("\"")&&(query.contains("AND")||query.contains("OR")||query.contains("NOT")))
             {
                 System.out.println("BONUS");
                 ranker.bonusParagraph(wp,query);

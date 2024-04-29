@@ -29,7 +29,7 @@ public class PhraseSearch
                 System.out.println("now scanning"+entry.getKey());
                 String body = result.getString("body");
                 System.out.println(body);
-                if (!body.toLowerCase().contains(modified_query.toLowerCase()))
+                if (!body.toLowerCase().contains(" "+modified_query.toLowerCase()+" "))
                 {
                     System.out.println(body.contains("phrase not found"));
                     toberemoved.add(entry.getKey());
@@ -48,6 +48,9 @@ public class PhraseSearch
         //AND higher precedence than OR
         Set<String> toberemoved=new HashSet<>();
         Map<String,String> urlBody=new HashMap<>();
+        String processedQuery=query;
+
+        //turning database into Map<"url","body">
         for (Map.Entry<String, Double> entry : urlScore.entrySet())
         {
             Document result = webpagesConnect.find(entry.getKey());
@@ -57,18 +60,58 @@ public class PhraseSearch
             }
         }
 
-        if(query.contains("AND")&&!query.contains("OR"))
+        //if contains NOT add them to toberemoved
+        if(query.contains("NOT")) {
+            String notPhrase="TO BE REMOVED";
+            while(processedQuery.contains("NOT"))
+            {
+                int indexNot=processedQuery.indexOf("NOT");
+                String temp=processedQuery.substring(indexNot+5);
+                int lastindex=temp.indexOf("\"");
+                StringBuilder sb = new StringBuilder(processedQuery);
+                if (indexNot != -1) {
+                    sb.delete(indexNot, indexNot+6 + lastindex);
+                }
+                notPhrase=processedQuery.substring(indexNot+3,indexNot+6 + lastindex);
+                System.out.println("NOT PHRASE");
+                System.out.println(urlBody.size());
+                notPhrase=notPhrase.replaceAll("\"","").trim();
+                System.out.println(notPhrase);
+
+                processedQuery = sb.toString().trim();
+                for (Map.Entry<String, String> entry : urlBody.entrySet()) {
+                    if (entry.getValue().toLowerCase().contains(" "+notPhrase.toLowerCase()+" "))
+                    {
+                        toberemoved.add(entry.getKey());
+                    }
+                }
+            }
+        }
+        if(!processedQuery.contains("OR")&&!processedQuery.contains("AND"))
         {
-            System.out.println("here fatma");
-            String modifiedQuery=query.replaceAll("\"","");
+            System.out.println(processedQuery);
+            System.out.println("to look for");
+            processedQuery=processedQuery.replaceAll("\"","").trim();
+            for (Map.Entry<String, String> entry : urlBody.entrySet()) {
+                if (!entry.getValue().toLowerCase().contains(" "+processedQuery.toLowerCase()+" "))
+                {
+                    toberemoved.add(entry.getKey());
+                }
+            }
+        }
+
+        if(processedQuery.contains("AND")&&!processedQuery.contains("OR"))
+        {
+            String modifiedQuery=processedQuery.replaceAll("\"","");
             String[] Phrases=modifiedQuery.split("AND");
             for(String str:Phrases)
             {
-                System.out.println(str);
+                System.out.println("AND PHRASE");
+                System.out.println(str.trim().toLowerCase());
                 for (Map.Entry<String, String> entry : urlBody.entrySet()) //key is url value is body
                 {
                     System.out.println("now scanning"+entry.getKey());
-                    if (!entry.getValue().toLowerCase().contains(str.trim().toLowerCase()))
+                    if (!entry.getValue().toLowerCase().contains(" "+str.trim().toLowerCase()+" "))
                     {
                         System.out.println("phrase not found");
                         toberemoved.add(entry.getKey());
@@ -76,22 +119,18 @@ public class PhraseSearch
                 }
 
             }
-            System.out.println("here fatma");
         }
-        if(!query.contains("AND")&&query.contains("OR"))
+        if(!processedQuery.contains("AND")&&processedQuery.contains("OR"))
         {
 //            System.out.println("here fatma");
-            String modifiedQuery=query.replaceAll("\"","");
+            String modifiedQuery=processedQuery.replaceAll("\"","");
             String[] Phrases=modifiedQuery.split("OR");
             for (Map.Entry<String, String> entry : urlBody.entrySet()) //key is url value is body
             {
                 Boolean Remove = true;
                 for(String str:Phrases)
                 {
-//                System.out.println(str);
-
-//                    System.out.println("now scanning"+entry.getKey());
-                    if (entry.getValue().toLowerCase().contains(str.trim().toLowerCase()))
+                    if (entry.getValue().toLowerCase().contains(" "+str.trim().toLowerCase()+" "))
                     {
 //                        System.out.println("phrase found");
                         Remove=false;
@@ -131,7 +170,7 @@ public class PhraseSearch
             for (Map.Entry<String, String> entry : urlBody.entrySet()) //key is url value is body
             {
                 String tobeSearched=entry.getValue().toLowerCase();
-                if (!(tobeSearched.contains(" "+firstPhrase+" ")&&tobeSearched.contains(" "+secondPhrase+" ")||tobeSearched.contains(" "+thirdPhrase+" ")))
+                if (!((tobeSearched.contains(" "+firstPhrase+" ")&&tobeSearched.contains(" "+secondPhrase+" "))||tobeSearched.contains(" "+thirdPhrase+" ")))
                 {
                     System.out.println("not found");
                     toberemoved.add(entry.getKey());
