@@ -7,30 +7,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Ranker {
-    public Set<String> rank_documents(Set<Document> relevant_docs)
-    {
-        //takes list of mongodb documents(enteries of db)
-        //returns list of ranked webpages
-        //retrieve popularity of web pages
-        Map<String, Double> webpageScores = new HashMap<>();
-        //giant loop and logic
 
-        return  sortByScore(webpageScores);
-
-
-    }
-    public static Set<String> sortByScore(Map<String,Double> urlScores)
-    {
-        List<Map.Entry<String, Double>> entries = new ArrayList<>(urlScores.entrySet());
-        entries.sort(Map.Entry.comparingByValue(Comparator.reverseOrder()));
-        List<String> sortedKeys = new ArrayList<>();
-        for (String key : urlScores.keySet())
-        {
-            sortedKeys.add(key);
-        }
-
-        return urlScores.keySet();
-    }
 
     public void rankbyTag(Map<PairSS,List<String>> TagPos,Map<String,Double> urlScores)
     {
@@ -98,8 +75,13 @@ public class Ranker {
 
         //loop on map urls and get popularity for each and add it to the scores
         for (String key : urlScore.keySet()) {
-           Double p=DB.get_page_popularity(key); //get popularity from db
-           urlScore.put(key,urlScore.get(key)+p);
+            Double existingScore = urlScore.get(key);
+
+            // Check if the existing score is null
+            if (existingScore != null) {
+                Double p = DB.get_page_popularity(key); //get popularity from db
+                urlScore.put(key, urlScore.get(key) + p);
+            }
         }
     }
     //TODO:setRelevantParagraph
