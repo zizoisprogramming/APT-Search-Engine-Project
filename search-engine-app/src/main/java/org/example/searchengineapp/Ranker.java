@@ -211,7 +211,7 @@ public class Ranker {
             String stemmed = obj.stem(str).toLowerCase();
             for(int i=0;i<bodyWords.length;i++)
             {
-                if(obj.stem(bodyWords[i]).equals(stemmed) && !StopWords.contains(stemmed))
+                if(obj.stem(bodyWords[i]).contains(stemmed) && !StopWords.contains(stemmed))
                 {
                     System.out.println("found");
                     System.out.println(stemmed);
