@@ -4,37 +4,51 @@
 <head>
   <title>JSP - Web UI</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Creepster&family=Rubik:wght@300&family=Stick+No+Bills&family=Ubuntu&family=Unlock&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Eater&display=swap');
+  </style>
+  <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #f2f2f2;
+      background-color: #FFF7EA;
+      background-image: url('bg.png');
+      background-size: cover;
       margin: 0;
       padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
     }
     h1 {
       color: #333;
       text-align: center;
     }
+    h3 {
+      color: #333;
+      text-align: center;
+      font-family: "Eater", serif;
+    }
     .container {
-      display: flex;
-      justify-content: center; /* Center horizontally */
-      align-items: flex-start; /* Align to the top */
-      padding: 20px; /* Add some padding */
+      text-align: center;
+      margin-top: -120px;
     }
     form {
       text-align: center;
     }
     input[type="text"] {
-      width: 300px;
+      width: 350px;
       padding: 10px;
+      margin-right: 100px;
       border-radius: 5px;
       border: 1px solid #ccc;
       font-size: 16px;
-      text-align: center; /* Center the text */
+      padding: 15px;
+      box-shadow: 3px 5px 6px rgba(0, 0, 0, 0.1);
     }
     button[type="submit"] {
-      margin-left: 10px; /* Add some space between input and button */
       padding: 10px 20px;
-      background-color: #4CAF50;
+      background-color: #E06126;
       color: white;
       border: none;
       border-radius: 5px;
@@ -42,9 +56,8 @@
       font-size: 16px;
     }
     button[type="submit"]:hover {
-      background-color: #45a049;
+      background-color: #FF864E;
     }
-    /* Autocomplete styles */
     .autocomplete {
       position: relative;
       display: inline-block;
@@ -52,8 +65,9 @@
     .autocomplete-content {
       display: none;
       position: absolute;
-      background-color: #f9f9f9;
-      min-width: 300px;
+      background-color: white;
+      width: calc(100% - 40px);
+      margin-top: 5px;
       box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
       z-index: 1;
     }
@@ -63,8 +77,14 @@
       text-decoration: none;
       display: block;
     }
+    .autocomplete-content a img {
+      margin-right: 10px;
+    }
     .autocomplete-content a:hover {
       background-color: #f1f1f1;
+    }
+    .logo img {
+      width: 150px;
     }
   </style>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -84,17 +104,15 @@
             var autocompleteContent = $("#autocompleteContent");
             autocompleteContent.empty();
             data.forEach(function(suggestion) {
-
               var suggestionLink = $('<a>', {
                 href: '#',
-                text: suggestion,
+                html: '<img src="spider.png" alt="Icon" width="16" height="16">' + suggestion,
                 click: function() {
                   selectSuggestion(suggestion);
                   return false;
                 }
               });
               autocompleteContent.append(suggestionLink);
-
             });
             if (data.length > 0) {
               $("#autocompleteDropdown").show();
@@ -105,7 +123,6 @@
         });
       });
     });
-
     function selectSuggestion(suggestion) {
       $('#queryInput').val(suggestion);
       $("#autocompleteDropdown").hide();
@@ -115,19 +132,20 @@
 <body>
 <div class="container">
   <div>
-    <h1>Welcome to the Search Engine</h1>
-    <div class="autocomplete">
-      <form action="ui-servlet" method="get">
-        <!-- Query input field -->
+    <img src="spider_logo.png" class="logo" width="300" height="300">
+  </div>
+  <div class="autocomplete">
+    <form action="ui-servlet" method="get">
+      <h3>Search Spider Web or type a phrase</h3>
+      <div style="position: relative;">
         <input type="text" id="queryInput" name="query" placeholder="Enter your query..." autocomplete="off">
-        <!-- Autocomplete dropdown -->
         <div id="autocompleteDropdown" class="autocomplete-content">
           <div id="autocompleteContent"></div>
         </div>
-        <!-- Submit button -->
-        <button type="submit">Submit</button>
-      </form>
-    </div>
+        <button type="submit" style="position: absolute; right: 0; top: 0; height: 100%;">Go!</button>
+
+      </div>
+    </form>
   </div>
 </div>
 </body>

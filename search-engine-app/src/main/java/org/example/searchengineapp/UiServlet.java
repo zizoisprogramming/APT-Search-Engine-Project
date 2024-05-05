@@ -61,6 +61,10 @@ public class UiServlet extends HttpServlet {
             out.println("<html>");
             out.println("<head>");
             out.println("<title>Search Result</title>");
+            out.println("<style>\n" +
+                    "    @import url('https://fonts.googleapis.com/css2?family=Creepster&family=Rubik:wght@300&family=Stick+No+Bills&family=Ubuntu&family=Unlock&display=swap');\n" +
+                    "    @import url('https://fonts.googleapis.com/css2?family=Eater&display=swap');\n" +
+                    "  </style>");
             out.println("<style>\n");
             out.println("form {text-align: center;margin-top: 50px;}");
             out.println("input[type=\"text\"] {width: 300px;padding: 10px;border-radius: 5px;border: 1px solid #ccc;font-size: 16px;}\n");
@@ -77,6 +81,7 @@ public class UiServlet extends HttpServlet {
                     "    h1 {\n" +
                     "        color: #1a0dab;\n" +
                     "        text-align: center;\n" +
+                    "       font-family: \"Eater\", serif;\n"+
                     " margin:20px;" +
                     "    }\n" +
                     "form{" +
@@ -156,13 +161,14 @@ public class UiServlet extends HttpServlet {
             out.println("<style>\n" +
                     "    body {\n" +
                     "      font-family: Arial, sans-serif;\n" +
-                    "      background-color: #f2f2f2;\n" +
+                    "      background-image: url('bg.png');\n" +
                     "      margin: 0;\n" +
                     "      padding: 0;\n" +
                     "    }\n" +
                     "    h1 {\n" +
                     "      color: #333;\n" +
                     "      text-align: center;\n" +
+                     "font-family: \"Eater\", serif; \n"+
                     "    }\n" +
                     "    .container {\n" +
                     "      display: flex;\n" +
@@ -184,7 +190,7 @@ public class UiServlet extends HttpServlet {
                     "    button[type=\"submit\"] {\n" +
                     "      margin-left: 10px; /* Add some space between input and button */\n" +
                     "      padding: 10px 20px;\n" +
-                    "      background-color: #4CAF50;\n" +
+                    "      background-color: #e06126;\n" +
                     "      color: white;\n" +
                     "      border: none;\n" +
                     "      border-radius: 5px;\n" +
@@ -192,7 +198,7 @@ public class UiServlet extends HttpServlet {
                     "      font-size: 16px;\n" +
                     "    }\n" +
                     "    button[type=\"submit\"]:hover {\n" +
-                    "      background-color: #45a049;\n" +
+                    "      background-color: #ff864e;\n" +
                     "    }\n" +
                     "    /* Autocomplete styles */\n" +
                     "    .autocomplete {\n" +
