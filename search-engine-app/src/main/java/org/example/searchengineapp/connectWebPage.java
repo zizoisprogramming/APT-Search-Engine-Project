@@ -6,9 +6,7 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import org.bson.Document;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class connectWebPage
 {
@@ -20,7 +18,7 @@ public class connectWebPage
         System.out.println("Created Mongo Connection successfully");
 
         MongoDatabase db = mongoClient.getDatabase("webPages");
-        collection= db.getCollection("dum");
+        collection= db.getCollection("clean_run");
 
         return collection;
     }
@@ -54,7 +52,8 @@ public class connectWebPage
     public List<WebPage> getWebPages(Map<String,Double> urls)
     {
         List<WebPage> result=new ArrayList<>();
-        for(Map.Entry<String,Double> url:urls.entrySet())
+        Set<Map.Entry<String, Double>> entries = new HashSet<>(urls.entrySet());
+        for(Map.Entry<String,Double> url:entries)
         {
             // Create a filter to match documents with the specified URL
 //            Document filter = new Document("url", url.getKey());

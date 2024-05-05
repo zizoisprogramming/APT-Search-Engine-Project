@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>JSP - Web UI</title>
+  <title>Spider Web</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Creepster&family=Rubik:wght@300&family=Stick+No+Bills&family=Ubuntu&family=Unlock&display=swap');
     @import url('https://fonts.googleapis.com/css2?family=Eater&display=swap');
@@ -129,6 +129,7 @@
       $("#autocompleteDropdown").hide();
     }
   </script>
+  <link rel="icon" type="image/png" href="spider.png">
 </head>
 <body>
 <div class="container">
