@@ -139,7 +139,7 @@ public class QueryProcessor {
             Document result = collection.find(Filters.eq("_id", str)).first();
             if(result!=null)
             { //result has the document with id=word
-                System.out.println("found matching doc for word "+str+"doc is");
+                System.out.println("found matching doc for word "+str+"doc is"+result);
                 matchingDocs.add(result);
                 try {
                     mapping(result,str);
@@ -216,11 +216,11 @@ public class QueryProcessor {
 
         List<WebPage> rankedWebPages=webpageConnect.getWebPages(urlScore);
 
-//        for(WebPage wp:rankedWebPages)
-//        {
-//            System.out.println(wp.getTitle());
-//        }
-//        System.out.println(rankedWebPages.size());
+        for(WebPage wp:rankedWebPages)
+        {
+            System.out.println(wp.getTitle());
+        }
+        System.out.println(rankedWebPages.size());
 
         //sort
         Collections.sort(rankedWebPages);

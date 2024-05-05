@@ -274,12 +274,19 @@ public class UiServlet extends HttpServlet {
 
             // Output search box
             query=query.replaceAll("\"","\\\"");
-//            System.out.println("value=\'"+temp+"\'");
+            query=query.replaceAll("\'","\\\'");
+
+            System.out.println(query);
 
             out.println("<div>");
             out.println("<div class=\"autocomplete\">");
             out.println("<form action=\"ui-servlet\" method=\"get\">");
-            out.println("<input type=\"text\" id=\"queryInput\" name=\"query\" value=\'"+query+"\' placeholder=\"Enter your query...\" autocomplete=\"off\">");
+
+            if(query.contains("\""))
+                out.println("<input type=\"text\" id=\"queryInput\" name=\"query\" value=\'"+query+"\' placeholder=\"Enter your query...\" autocomplete=\"off\">");
+            else
+                out.println("<input type=\"text\" id=\"queryInput\" name=\"query\" value=\""+query+"\" placeholder=\"Enter your query...\" autocomplete=\"off\">");
+
             out.println("<div id=\"autocompleteDropdown\" class=\"autocomplete-content\">");
             out.println("<div id=\"autocompleteContent\"></div>");
             out.println("</div>");
@@ -307,17 +314,28 @@ public class UiServlet extends HttpServlet {
             out.println("<div class=\"pagination_section\">");
             System.out.println(query);
             for (int i = 1; i <= totalPages; i++) {
-                if(Math.abs(i-page)<4)
-                    out.println("<a href=\'?query=" + query + "&page=" + i + "\'>Page " + i + "</a>");
-                else if(i==1)
-                {
-                    out.println("<a href=\'?query=" + query + "&page=" + i + "\'>Page " + i + "</a> <p>....</p>");
+                if(query.contains("\"")) {
+                    if (Math.abs(i - page) < 4)
+                        out.println("<a href=\'?query=" + query + "&page=" + i + "\'>Page " + i + "</a>");
+                    else if (i == 1) {
+                        out.println("<a href=\'?query=" + query + "&page=" + i + "\'>Page " + i + "</a> <p>....</p>");
 
+                    } else if (i == totalPages) {
+                        out.println("<p>....</p><a href=\'?query=" + query + "&page=" + i + "\'>Page " + i + "</a>");
+
+                    }
                 }
-                else if(i==totalPages)
+                else
                 {
-                    out.println("<p>....</p><a href=\'?query=" + query + "&page=" + i + "\'>Page " + i + "</a>");
+                    if (Math.abs(i - page) < 4)
+                        out.println("<a href=\"?query=" + query + "&page=" + i + "\">Page " + i + "</a>");
+                    else if (i == 1) {
+                        out.println("<a href=\"?query=" + query + "&page=" + i + "\">Page " + i + "</a> <p>....</p>");
 
+                    } else if (i == totalPages) {
+                        out.println("<p>....</p><a href=\"?query=" + query + "&page=" + i + "\">Page " + i + "</a>");
+
+                    }
                 }
             }
             out.println("</div>");
