@@ -108,25 +108,27 @@ public class Ranker {
         }
         System.out.println(index);
         Integer start=0,end=0;
-        if(index-100>0)
-        {
-            start=index-100;
-            while (start!=0&&wp.getBody().charAt(start)!=' ')
-            {
-                start--;
+        if (index != -1) { // Check if the index is found
+            if (index - 100 > 0) {
+                start = index - 100;
+                while (start != 0 && wp.getBody().charAt(start) != ' ') {
+                    start--;
+                }
+            }
+            if (index + 100 < wp.getBody().length()) {
+                end = index + 100;
+                while (end != wp.getBody().length() - 1 && wp.getBody().charAt(end) != ' ') {
+                    end++;
+                }
             }
         }
-        if(index+100<wp.getBody().length())
-        {
-            end=index+100;
-            while (end!=wp.getBody().length()-1&&wp.getBody().charAt(end)!=' ')
-            {
-                end++;
-            }
+        if (start >= 0 && end > start && end < wp.getBody().length()) {
+            String relevantParagraph = wp.getBody().substring(start, end) + "...";
+            wp.setBody(relevantParagraph);
+        } else {
+            // Handle case where relevant paragraph cannot be extracted
+            wp.setBody("No relevant paragraph found");
         }
-        String relevantParagraph=wp.getBody().substring(start,end)+"...";
-        wp.setBody(relevantParagraph);
-//        System.out.println(relevantParagraph);
     }
 
     public void bonusParagraph(WebPage wp,String query)
