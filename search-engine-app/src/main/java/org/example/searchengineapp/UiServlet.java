@@ -300,8 +300,19 @@ public class UiServlet extends HttpServlet {
             int totalPages = (int) Math.ceil((double) result.size() / resultsPerPage);
             out.println("<div class=\"pagination_section\">");
             System.out.println(query);
-            for (int i = 1; i <= 100; i++) {
-                out.println("<a href=\'?query=" + query + "&page=" + i + "\'>Page " + i + "</a>");
+            for (int i = 1; i <= totalPages; i++) {
+                if(Math.abs(i-page)<4)
+                    out.println("<a href=\'?query=" + query + "&page=" + i + "\'>Page " + i + "</a>");
+                else if(i==1)
+                {
+                    out.println("<a href=\'?query=" + query + "&page=" + i + "\'>Page " + i + "</a> <p>....</p>");
+
+                }
+                else if(i==totalPages)
+                {
+                    out.println("<p>....</p><a href=\'?query=" + query + "&page=" + i + "\'>Page " + i + "</a>");
+
+                }
             }
             out.println("</div>");
 
