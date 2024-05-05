@@ -235,8 +235,16 @@ public class UiServlet extends HttpServlet {
             out.println("var autocompleteContent = $('#autocompleteContent');");
             out.println("autocompleteContent.empty();");
             out.println("data.forEach(function(suggestion) {");
-            out.println("autocompleteContent.append('<a href=\"#\" onclick=\"selectSuggestion(\\'' + suggestion + '\\')\">' + suggestion + '</a>');");
-
+//            out.println("autocompleteContent.append('<a href=\"#\" onclick=\"selectSuggestion(\\'' + suggestion + '\\')\">' + suggestion + '</a>');");
+            out.println("var suggestionLink = $('<a>', {\n" +
+                    "                href: '#',\n" +
+                    "                text: suggestion,\n" +
+                    "                click: function() {\n" +
+                    "                  selectSuggestion(suggestion);\n" +
+                    "                  return false;\n" +
+                    "                }\n" +
+                    "              });\n" +
+                    "              autocompleteContent.append(suggestionLink);");
             out.println("});");
             out.println("if (data.length > 0) {");
 

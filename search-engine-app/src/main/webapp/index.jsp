@@ -84,7 +84,17 @@
             var autocompleteContent = $("#autocompleteContent");
             autocompleteContent.empty();
             data.forEach(function(suggestion) {
-              autocompleteContent.append('<a href="#" onclick="selectSuggestion(\'' + suggestion + '\')">' + suggestion + '</a>');
+
+              var suggestionLink = $('<a>', {
+                href: '#',
+                text: suggestion,
+                click: function() {
+                  selectSuggestion(suggestion);
+                  return false;
+                }
+              });
+              autocompleteContent.append(suggestionLink);
+
             });
             if (data.length > 0) {
               $("#autocompleteDropdown").show();
@@ -97,7 +107,7 @@
     });
 
     function selectSuggestion(suggestion) {
-      $("#queryInput").val(suggestion);
+      $('#queryInput').val(suggestion);
       $("#autocompleteDropdown").hide();
     }
   </script>
