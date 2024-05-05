@@ -89,7 +89,7 @@ public class UiServlet extends HttpServlet {
                     "margin:5px;}" +
                     "\n" +
                     "    h4 {\n" +
-                    "        color: #1a0dab;\n" +
+                    "        color: #D44300;\n" +
                     "        margin: 0;\n" +
                     "        padding: 0;\n" +
                     "        font-size: 18px;\n" +
@@ -109,9 +109,9 @@ public class UiServlet extends HttpServlet {
                     "    }\n" +
                     "\n" +
                     "    .result {\n" +
-                    "        margin: 20px 0;\n" +
+                    "        margin: 20px ;\n" +
                     "        padding: 10px;\n" +
-                    "        background-color: #fff;\n" +
+                    "        background-color: #FFFDF9;\n" +
                     "        border-radius: 8px;\n" +
                     "        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);\n" +
                     "    }\n" +
@@ -284,7 +284,7 @@ public class UiServlet extends HttpServlet {
             out.println("<div id=\"autocompleteContent\"></div>");
             out.println("</div>");
 
-            out.println("<button type=\"submit\">Submit</button>");
+            out.println("<button type=\"submit\">Go!</button>");
             out.println("</form>");
             out.println("</div>");
             out.println("</div>");

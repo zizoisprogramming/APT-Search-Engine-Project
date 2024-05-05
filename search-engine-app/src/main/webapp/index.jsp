@@ -73,6 +73,7 @@
     }
     .autocomplete-content a {
       color: black;
+      text-align: left;
       padding: 12px 16px;
       text-decoration: none;
       display: block;
