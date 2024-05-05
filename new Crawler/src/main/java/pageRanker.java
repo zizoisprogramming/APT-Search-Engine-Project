@@ -7,25 +7,26 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 import org.bson.Document;
 
+import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class pageRanker {
     //data base
     private static final String MONGODB_DATABASE_NAME = "webPages";
-    private static final String MONGODB_COLLECTION_NAME = "dum";
+    private static final String MONGODB_COLLECTION_NAME = "clean_run";
 
     //PR algorithm
     private static final double DAMPING_FACTOR = 0.85;
     private static final int MAX_ITERATIONS = 100;
     private static final double CONVERGENCE_THRESHOLD = 0.0001;
+    private static Vector<String> links=new Vector<>();
 
     public static void main(String[] args) {
         try  {
@@ -34,10 +35,15 @@ public class pageRanker {
             MongoDatabase database = mongoClient.getDatabase(MONGODB_DATABASE_NAME);
             MongoCollection<Document> collection = database.getCollection(MONGODB_COLLECTION_NAME);
             //store web pages to a list to run the algorithm
+            //readLinks("./links.txt");
+            //outgoingLinks();
             List<WebPage> webPages = retrieveWebPages(collection);
             //  extractOutgoingLinks(webPages,collection);
             //run the algorithm
             System.out.println("algorithm starting..");
+
+
+
             Map<String, Double> pageRankScores = computePageRank(webPages);
             //update popularity in the db
             updatePageRankScores(collection, pageRankScores);
@@ -88,6 +94,7 @@ public class pageRanker {
 
         // Perform iterative PageRank computation
         for (int iter = 0; iter < MAX_ITERATIONS; iter++) {
+            System.out.println("iteration "+iter);
             double sumDelta = 0.0;
 
             for (WebPage page : webPages) {
@@ -119,30 +126,103 @@ public class pageRanker {
             collection.updateOne(Filters.eq("url", url), new Document("$set", new Document("score", score)));
         });
     }
-    private static void extractOutgoingLinks(List<WebPage> pages, MongoCollection<Document> collection) {
-        for (WebPage page : pages) {
-            try {
-                // Fetch the HTML content of the page using Jsoup
-                org.jsoup.nodes.Document doc = Jsoup.connect(page.getUrl()).get();
 
-                // Extract all <a> elements (links) from the page
-                Elements links = doc.select("a[href]");
+    private static void readLinks(String filePath) {
+            try (BufferedReader br =new BufferedReader(new FileReader(filePath))){
+                String line;
+                // Read each line from the file until reaching the end
+                while ((line = br.readLine()) != null) {
+                    // Process the line here (e.g., add it to the shared variable)
+                    links.addElement(line);
 
-                // Iterate over the links and extract the "href" attribute
-                List<String> outgoing=new ArrayList<String>();
-                for (Element link : links) {
-                    String outgoingLink = link.absUrl("href");
-                    outgoing.add(outgoingLink); // Update WebPage object with outgoing link
                 }
-
-                // Update the document in the collection with the updated outgoing links
-                collection.updateOne(Filters.eq("url", page.getUrl()), Updates.set("outgoing_links", outgoing));
-
-            } catch (IOException e) {
-                // Handle any IO exceptions
+            } catch(IOException e){
                 e.printStackTrace();
             }
+    }
+    public static boolean isValidURL(String url) {
+        try {
+            new java.net.URL(url).toURI();
+            return true;
+        } catch (Exception e) {
+            return false;
         }
+    }
+    public static void outgoingLinks()
+    {
+        webDB WEBDB;
+        WEBDB = new webDB();
+        Map<String, List<String>> outgoing_links = new HashMap<String, List<String>>();
+        Map<String, Vector<String>> linksContent = new HashMap<String, Vector<String>>();
+        int count = 0;
+        int sizeError = 0;
+        int unlocated = 0;
+        for(String url: links)
+        {
+            System.out.println("Getting Links " + count);
+            count++;
+            if(count == 100)
+            {
+                //break;
+            }
+            try {
+                if (!isValidURL(url)) {
+                    System.out.println("Invalid URL: " + url);
+                    continue;
+                }
+                Connection con = Jsoup.connect(url);
+                org.jsoup.nodes.Document doc = con.get();
+                if (con.response().statusCode() == 200) {
+                    Vector<String> temp = new Vector<String>();
+                    temp.add(doc.title());
+                    temp.add(doc.body().text());
+                    linksContent.put(url, temp);
+                    List<String> L = new ArrayList<String>();
+                    for (Element link : doc.select("a[href]")) {
+
+                        String nextLink = link.absUrl("href");
+                        if(!links.contains(nextLink))
+                        {
+                            continue;
+                        }
+
+                        L.add(nextLink);
+                    }
+                    outgoing_links.put(url, L);
+                }
+                if(!linksContent.containsKey(url) || linksContent.get(url).size() != 2)
+                {
+                    if (!linksContent.containsKey(url) )
+                    {
+                        unlocated++;
+                    }
+                    else
+                    {
+                        sizeError++;
+                    }
+                    WEBDB.write_url(url, "", "");
+                    System.out.println("Error in Vector size: " + sizeError + " Error in location: " + unlocated);
+                }
+                else
+                {
+                    WEBDB.write_url(url, linksContent.get(url).get(0), linksContent.get(url).get(1));
+                }
+                if(!outgoing_links.containsKey(url))
+                {
+                    WEBDB.insert_to_DB(url, new ArrayList<String>());
+                }
+                else {
+                    System.out.println("OutgoingSize " + outgoing_links.get(url).size());
+                    WEBDB.insert_to_DB(url, outgoing_links.get(url));
+                }
+                linksContent.clear();
+                outgoing_links.clear();
+
+            } catch (IOException e) {
+
+            }
+        }
+
     }
 
 }

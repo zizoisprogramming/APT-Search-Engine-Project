@@ -48,114 +48,7 @@ class Crawler {
         }
     }
 
-    public static void outgoingLinks()
-    {
-        webDB WEBDB;
-        WEBDB = new webDB();
-        Map<String, List<String>> outgoing_links = new HashMap<String, List<String>>();
-        Map<String, Vector<String>> linksContent = new HashMap<String, Vector<String>>();
-        int count = 0;
-        int sizeError = 0;
-        int unlocated = 0;
-        for(String url: SharedVars.files)
-        {
-            System.out.println("Getting Links " + count);
-            count++;
-            if(count == 100)
-            {
-                //break;
-            }
-            try {
-                if (!spiderWebs.isValidURL(url)) {
-                    System.out.println("Invalid URL: " + url);
-                    continue;
-                }
-                Connection con = Jsoup.connect(url);
-                Document doc = con.get();
-                if (con.response().statusCode() == 200) {
-                    Vector<String> temp = new Vector<String>();
-                    temp.add(doc.title());
-                    temp.add(doc.body().text());
-                    linksContent.put(url, temp);
-                    List<String> links = new ArrayList<String>();
-                    for (Element link : doc.select("a[href]")) {
-                        String nextLink = link.absUrl("href");
-                        if(!SharedVars.files.contains(nextLink))
-                        {
-                            continue;
-                        }
 
-                        links.add(nextLink);
-                    }
-                    outgoing_links.put(url, links);
-                }
-                if(!linksContent.containsKey(url) || linksContent.get(url).size() != 2)
-                {
-                    if (!linksContent.containsKey(url) )
-                    {
-                        unlocated++;
-                    }
-                    else
-                    {
-                        sizeError++;
-                    }
-                    WEBDB.write_url(url, "", "");
-                    System.out.println("Error in Vector size: " + sizeError + " Error in location: " + unlocated);
-                }
-                else
-                {
-                    WEBDB.write_url(url, linksContent.get(url).get(0), linksContent.get(url).get(1));
-                }
-                if(!outgoing_links.containsKey(url))
-                {
-                    WEBDB.insert_to_DB(url, new ArrayList<String>());
-                }
-                else {
-                    System.out.println("OutgoingSize " + outgoing_links.get(url).size());
-                    WEBDB.insert_to_DB(url, outgoing_links.get(url));
-                }
-                linksContent.clear();
-                outgoing_links.clear();
-
-            } catch (IOException e) {
-
-            }
-        }
-        int DBinserted = 0;
-        /*for(String url: SharedVars.files) {
-            System.out.println("Inserting to DB: " + DBinserted);
-            DBinserted++;
-            if(DBinserted == 100)
-            {
-                break;
-            }
-            if(!linksContent.containsKey(url) || linksContent.get(url).size() != 2)
-            {
-                if (!linksContent.containsKey(url) )
-                {
-                    unlocated++;
-                }
-                else
-                {
-                    sizeError++;
-                }
-                WEBDB.write_url(url, "", "");
-                System.out.println("Error in Vector size: " + sizeError + " Error in location: " + unlocated);
-            }
-            else
-            {
-                WEBDB.write_url(url, linksContent.get(url).get(0), linksContent.get(url).get(1));
-            }
-            if(!outgoing_links.containsKey(url))
-            {
-                WEBDB.insert_to_DB(url, new ArrayList<String>());
-            }
-            else {
-                System.out.println("OutgoingSize " + outgoing_links.get(url).size());
-                WEBDB.insert_to_DB(url, outgoing_links.get(url));
-            }
-        }*/
-    }
 
     private static void readCompactStrings(String filePath) {
         synchronized (SharedVars.stringsLock) {
@@ -224,7 +117,6 @@ class Crawler {
             }
         }
         long startTime = System.currentTimeMillis();
-        outgoingLinks();
         long endTime = System.currentTimeMillis();
         long timeElapsed = endTime - startTime;
         float minutes = timeElapsed / 60000;
