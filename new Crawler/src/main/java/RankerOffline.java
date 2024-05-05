@@ -5,12 +5,6 @@ import com.mongodb.MongoConfigurationException;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.MongoCursor;
-import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.model.Filters;
-import com.mongodb.client.model.Updates;
-import com.mongodb.client.result.DeleteResult;
-import com.mongodb.client.result.InsertOneResult;
-import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
 
 import java.util.HashMap;
@@ -25,7 +19,7 @@ public class RankerOffline {
     //extract tf
     //add attribute "tf-idf" =tf*idf
     private static String db_name="Web-urls";
-    private static String collection_name="urls";
+    private static String collection_name="clean_indexer";
     private static MongoClient mongoClient;
     private static  MongoCollection<Document> collection;
     private static final int no_of_docs=6000;
@@ -48,7 +42,7 @@ public class RankerOffline {
             e.printStackTrace();
         }
         MongoDatabase mydatabase = mongoClient.getDatabase(db_name);
-        collection = mydatabase.getCollection("urls");
+        collection = mydatabase.getCollection(collection_name);
     }
     private static void calculate_TF_IDF()
     {
@@ -70,9 +64,11 @@ public class RankerOffline {
                 for (Document urlDocument : urlList) {
                     // update the document to have tf-idf
                     String url = urlDocument.getString("url");
-                    double tf = urlDocument.getDouble("tf");
-                    double tf_idf= tf*IDF;
-                    urlDocument.put("tf-idf",tf_idf);
+                    Number tfNumber = (Number) urlDocument.get("tf");
+                    double tf = tfNumber.doubleValue();
+
+                    double tf_idf = tf * IDF;
+                    urlDocument.put("tf-idf", tf_idf);
                 }
 
                 Object id = document.get("_id");
