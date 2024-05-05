@@ -204,17 +204,20 @@ public class Ranker {
     private Integer stem(String body,String[] words)
     {
         Integer index=0;
-        String[] bodyWords=body.toLowerCase().split(" ");
+        // Define a regex pattern to match punctuation
+        String regex = "[\\p{Punct}]";
+        String[] bodyWords=body.toLowerCase().replaceAll(regex,"").split(" ");
         PorterStemmer obj=new PorterStemmer();
         for(String str:words)
         {
             String stemmed = obj.stem(str).toLowerCase();
             for(int i=0;i<bodyWords.length;i++)
             {
-                if(obj.stem(bodyWords[i]).contains(stemmed) && !StopWords.contains(stemmed))
+                if(obj.stem(bodyWords[i]).equals(stemmed) && !StopWords.contains(stemmed))
                 {
                     System.out.println("found");
                     System.out.println(stemmed);
+                    System.out.println(obj.stem(bodyWords[i]));
                     return body.indexOf(bodyWords[i]);
                 }
             }
