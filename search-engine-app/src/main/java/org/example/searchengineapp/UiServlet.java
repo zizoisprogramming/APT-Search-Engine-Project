@@ -130,6 +130,7 @@ public class UiServlet extends HttpServlet {
                     "\n" +
                     "    .pagination_section {\n" +
                     "        display: flex;\n" +
+                    "  flex-wrap: wrap;\n" +
                     "        justify-content: center;\n" +
                     "        align-items: center;\n" +
                     "        margin-top: 20px;\n" +
@@ -299,7 +300,7 @@ public class UiServlet extends HttpServlet {
             int totalPages = (int) Math.ceil((double) result.size() / resultsPerPage);
             out.println("<div class=\"pagination_section\">");
             System.out.println(query);
-            for (int i = 1; i <= totalPages; i++) {
+            for (int i = 1; i <= 100; i++) {
                 out.println("<a href=\'?query=" + query + "&page=" + i + "\'>Page " + i + "</a>");
             }
             out.println("</div>");
