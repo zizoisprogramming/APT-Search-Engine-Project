@@ -62,21 +62,22 @@ public class indexer {
     }
     private static int addWord(String words, String type, int index) {
         for(String word : words.split(" ")) {
-
+            word = word.toLowerCase();
             if (StopWords.contains(word)) {
                 continue;
             }
             // Stem the word from commas, periods, etc. using regex
             // HABET TANDEEF
             word = word.replaceAll("[^a-zA-Z0-9]", "");
-            word = word.toLowerCase();
-            word = porterStemmer.stem(word);
 
+            word = porterStemmer.stem(word);
             if (word.length() == 0)
             {
                 continue;
             }
-
+            if (StopWords.contains(word)) {
+                continue;
+            }
             index++;
             // Check if the word exists in WordsPerSite
 
@@ -160,34 +161,34 @@ public class indexer {
     public static void index() {
 
         for (String url : URLs) {
-                // Get the content of the page
-                int words = getContent(url);
-                // Tokenize the content
-                for(Map.Entry<String, Vector<Map<String, Integer>>> entry : WordsPerSite.entrySet()) {
-                    String word = entry.getKey();
-                    Vector<Map<String, Integer>> wordMap = entry.getValue();
-                    ArrayList<Map<String, Integer>> List = new ArrayList<>();
-                    for(Map<String, Integer> map : wordMap) {
-                        List.add(map);
-                    }
-                    float TF = (float) wordMap.size() / words;
-                    if(!mydb.add(word, url, List, TF, 0))
-                        mydb.updateSites(word, url, List, TF);
+            // Get the content of the page
+            int words = getContent(url);
+            // Tokenize the content
+            for(Map.Entry<String, Vector<Map<String, Integer>>> entry : WordsPerSite.entrySet()) {
+                String word = entry.getKey();
+                Vector<Map<String, Integer>> wordMap = entry.getValue();
+                ArrayList<Map<String, Integer>> List = new ArrayList<>();
+                for(Map<String, Integer> map : wordMap) {
+                    List.add(map);
                 }
-                WordsPerSite.clear();
+                float TF = (float) wordMap.size() / words;
+                if(!mydb.add(word, url, List, TF, 0))
+                    mydb.updateSites(word, url, List, TF);
+            }
+            WordsPerSite.clear();
 
-                //add link to indexed txt
-                try {
-                    FileWriter fw = new FileWriter("indexed.txt", true);
-                    BufferedWriter bw = new BufferedWriter(fw);
-                    bw.write(url);
-                    bw.newLine();
-                    bw.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+            //add link to indexed txt
+            try {
+                FileWriter fw = new FileWriter("indexed.txt", true);
+                BufferedWriter bw = new BufferedWriter(fw);
+                bw.write(url);
+                bw.newLine();
+                bw.close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
+    }
     public static void readStopWords(String filePath) {
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
@@ -212,7 +213,7 @@ public class indexer {
         long endTime = System.currentTimeMillis();
         long timeElapsed = endTime - startTime;
         float minutes = timeElapsed / 60000;
-        System.out.println("Time elapsed: " + minutes + " minutes");
+        System.out.println("Time elapsed 6k " + minutes + " minutes");
         mydb.endConnection();
 
     }
