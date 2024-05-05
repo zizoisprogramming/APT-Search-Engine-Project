@@ -2,12 +2,32 @@ package org.example.searchengineapp;
 
 import org.bson.Document;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class Ranker {
+    private static Vector<String> StopWords = new Vector<String>();
 
+    public Ranker()
+    {
+        readStopWords("C:\\Users\\ASM EL Masrya\\Desktop\\ostor yarab\\APT-Search-Engine-Project\\search-engine-app\\src\\main\\java\\org\\example\\searchengineapp\\stop_words.txt");
+    }
+    public static void readStopWords(String filePath) {
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            // Read each line from the file until reaching the end
+            while ((line = br.readLine()) != null) {
+                // Process the line here (e.g., add it to the shared variable)
+                StopWords.add(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public void rankbyTag(Map<PairSS,List<String>> TagPos,Map<String,Double> urlScores)
     {
@@ -184,16 +204,17 @@ public class Ranker {
     private Integer stem(String body,String[] words)
     {
         Integer index=0;
-        String[] bodyWords=body.split(" ");
+        String[] bodyWords=body.toLowerCase().split(" ");
         PorterStemmer obj=new PorterStemmer();
         for(String str:words)
         {
             String stemmed = obj.stem(str).toLowerCase();
             for(int i=0;i<bodyWords.length;i++)
             {
-                if(obj.stem(bodyWords[i]).equals(stemmed))
+                if(obj.stem(bodyWords[i]).equals(stemmed) && !StopWords.contains(stemmed))
                 {
                     System.out.println("found");
+                    System.out.println(stemmed);
                     return body.indexOf(bodyWords[i]);
                 }
             }

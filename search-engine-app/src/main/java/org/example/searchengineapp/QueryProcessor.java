@@ -33,7 +33,6 @@ public class QueryProcessor {
         this.collection = c.connection();
         this.ranker=new Ranker();
         readStopWords("C:\\Users\\ASM EL Masrya\\Desktop\\ostor yarab\\APT-Search-Engine-Project\\search-engine-app\\src\\main\\java\\org\\example\\searchengineapp\\stop_words.txt");
-        System.out.println(StopWords);
     }
     public static void readStopWords(String filePath) {
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
