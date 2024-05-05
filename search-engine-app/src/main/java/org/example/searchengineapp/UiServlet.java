@@ -323,19 +323,22 @@ public class UiServlet extends HttpServlet {
     }
     private String formatbody(String body,String query)
     {
-        String[] words = body.split("\\s+");
-        String[] highlightWords_aux=query.split("\\s+");
+        String regex = "[\\p{Punct}]";
+        String[] words = body.replaceAll(regex,"").split("\\s+");
+        String[] highlightWords_aux=query.replaceAll("\"","").split("\\s+");
         // set for query words
         Set<String> highlightWords = new HashSet<>();
+        PorterStemmer obj = new PorterStemmer();
 
         // Add words to the set
         for (String word : highlightWords_aux) {
-            highlightWords.add(word.toLowerCase());
+            highlightWords.add(obj.stem(word.toLowerCase()));
         }
         StringBuilder htmlOutput = new StringBuilder("<p>Paragraph: ");
 
-        for (String word : words) {
-             if (highlightWords.contains(word.toLowerCase())){
+        for (String word : words)
+        {
+             if (highlightWords.contains(obj.stem(word.toLowerCase()))){
                 // Highlight
                 htmlOutput.append("<b>").append(word).append("</b>");
             } else {
@@ -349,8 +352,6 @@ public class UiServlet extends HttpServlet {
         htmlOutput.append("</p>");
         return htmlOutput.toString();
     }
-
-
     public void destroy() {
         queryDB.close();
     }
