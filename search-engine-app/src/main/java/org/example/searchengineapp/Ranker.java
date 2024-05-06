@@ -149,6 +149,7 @@ public class Ranker {
             // Handle case where relevant paragraph cannot be extracted
             wp.setBody("No relevant paragraph found");
         }
+//        System.out.println(wp.getBody());
     }
 
     public void bonusParagraph(WebPage wp,String query)
@@ -198,13 +199,11 @@ public class Ranker {
         }
         String relevantParagraph=wp.getBody().substring(start,end)+"...";
         wp.setBody(relevantParagraph);
-
     }
 
     private Integer stem(String body,String[] words)
     {
         Integer index=0;
-        // Define a regex pattern to match punctuation
         String regex = "[\\p{Punct}]";
         String[] bodyWords=body.toLowerCase().replaceAll(regex,"").split(" ");
         PorterStemmer obj=new PorterStemmer();
@@ -213,15 +212,15 @@ public class Ranker {
             String stemmed = obj.stem(str).toLowerCase();
             for(int i=0;i<bodyWords.length;i++)
             {
-                if(obj.stem(bodyWords[i]).equals(stemmed) && !StopWords.contains(stemmed))
+                if(obj.stem(bodyWords[i]).equals(stemmed)&&bodyWords[i].indexOf(str)==0 && !StopWords.contains(str.toLowerCase()))
                 {
                     System.out.println("found");
-                    System.out.println(stemmed);
-                    System.out.println(obj.stem(bodyWords[i]));
-                    return body.indexOf(bodyWords[i]);
+                    return body.indexOf(" "+bodyWords[i]);
                 }
             }
         }
+//        System.out.println(body);
+        System.out.println(bodyWords);
         return index;
     }
 }
