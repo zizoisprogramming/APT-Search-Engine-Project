@@ -207,6 +207,7 @@ public class Ranker {
         String regex = "[\\p{Punct}]";
         String[] bodyWords=body.toLowerCase().replaceAll(regex,"").split(" ");
         PorterStemmer obj=new PorterStemmer();
+        String[] auxWords=new String[bodyWords.length];
         for(String str:words)
         {
             String stemmed = obj.stem(str).toLowerCase();
@@ -215,12 +216,10 @@ public class Ranker {
                 if(obj.stem(bodyWords[i]).equals(stemmed)&&bodyWords[i].indexOf(str)==0 && !StopWords.contains(str.toLowerCase()))
                 {
                     System.out.println("found");
-                    return body.indexOf(" "+bodyWords[i]);
+                    return body.indexOf(" "+bodyWords[i]+" ")!=-1?body.indexOf(" "+bodyWords[i]+" "):body.indexOf(" "+bodyWords[i]);
                 }
             }
         }
-//        System.out.println(body);
-        System.out.println(bodyWords);
         return index;
     }
 }
