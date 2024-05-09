@@ -2,6 +2,7 @@ package org.example.searchengineapp;
 
 
 import com.mongodb.MongoClient;
+import com.mongodb.MongoClientException;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
@@ -12,13 +13,21 @@ public class connectDB //indexer db
 {
     public MongoCollection<Document> connection()
     {
-        // Creating a Mongo client
-        MongoClient mongoClient = new MongoClient( "localhost" , 27017 );
-        System.out.println("Created Mongo Connection successfully");
+        try {
 
-        MongoDatabase db = mongoClient.getDatabase("Web-urls");
-        MongoCollection<Document> collection= db.getCollection("urls");
+            // Creating a Mongo client
+            MongoClient mongoClient = new MongoClient("localhost", 27017);
+            System.out.println("Created Mongo Connection successfully");
 
-        return collection;
+            MongoDatabase db = mongoClient.getDatabase("Web-urls");
+            MongoCollection<Document> collection = db.getCollection("clean_indexer");
+
+            return collection;
+        }
+        catch (MongoClientException e)
+        {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

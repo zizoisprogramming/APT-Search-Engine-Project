@@ -1,6 +1,7 @@
 package org.example.searchengineapp;
 
 import com.mongodb.MongoClient;
+import com.mongodb.MongoClientException;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
@@ -13,14 +14,20 @@ public class connectWebPage
     private static MongoCollection<Document> collection;
     public MongoCollection<Document> connection()
     {
-        // Creating a Mongo client
-        MongoClient mongoClient = new MongoClient( "localhost" , 27017 );
-        System.out.println("Created Mongo Connection successfully");
+        try {
+            // Creating a Mongo client
+            MongoClient mongoClient = new MongoClient("localhost", 27017);
+            MongoDatabase db = mongoClient.getDatabase("webPages");
+            collection = db.getCollection("clean_run");
+            System.out.println("Created Mongo Connection successfully");
 
-        MongoDatabase db = mongoClient.getDatabase("webPages");
-        collection= db.getCollection("clean_run");
-
-        return collection;
+            return collection;
+        }
+        catch (MongoClientException e)
+        {
+           e.printStackTrace();
+           return null;
+        }
     }
     public double get_page_popularity(String url)
     {

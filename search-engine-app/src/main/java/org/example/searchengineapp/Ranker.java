@@ -14,7 +14,7 @@ public class Ranker {
 
     public Ranker()
     {
-        readStopWords("C:\\Users\\ASM EL Masrya\\Desktop\\ostor yarab\\APT-Search-Engine-Project\\search-engine-app\\src\\main\\java\\org\\example\\searchengineapp\\stop_words.txt");
+        readStopWords("F:\\APT-Search-Engine-Project\\search-engine-app\\src\\main\\java\\org\\example\\searchengineapp\\stop_words.txt");
     }
     public static void readStopWords(String filePath) {
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
@@ -32,14 +32,14 @@ public class Ranker {
     public void rankbyTag(Map<PairSS,List<String>> TagPos,Map<String,Double> urlScores)
     {
         // Assign weights (adjust as needed)
-        double h6Weight = 0.2;
-        double h5Weight = 0.22;
-        double h4Weight = 0.24;
-        double h3Weight = 0.26;
-        double h2Weight = 0.28;
-        double h1Weight = 0.3;
-        double titleWeight = 0.4;
-        double paragraphWeight = 0.1;
+        double h6Weight = 2;
+        double h5Weight = 2;
+        double h4Weight = 4;
+        double h3Weight = 4;
+        double h2Weight = 8;
+        double h1Weight = 8;
+        double titleWeight = 16;
+        double paragraphWeight = 1;
 
         double initialScore = 0.0;
         for (Map.Entry<PairSS, List<String>> entry : TagPos.entrySet())
@@ -82,7 +82,7 @@ public class Ranker {
             }
             if(urlScores.containsKey(entry.getKey().getsecond()))
             {
-                initialScore += urlScores.get(entry.getKey().getsecond());
+                initialScore *= urlScores.get(entry.getKey().getsecond());
                 urlScores.put(entry.getKey().getsecond(), initialScore);
             }
         }
@@ -100,6 +100,7 @@ public class Ranker {
             // Check if the existing score is null
             if (existingScore != null) {
                 Double p = DB.get_page_popularity(key); //get popularity from db
+                 if (p != null)
                 urlScore.put(key, urlScore.get(key) + p);
             }
         }

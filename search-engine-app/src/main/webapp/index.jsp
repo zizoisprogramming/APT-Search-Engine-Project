@@ -133,6 +133,7 @@
 </head>
 <body>
 <div class="container">
+    <img src="spider_gif.gif" width="120" height="120" style="float: right; margin-left: 200px;">
   <div>
     <img src="spider_logo.png" class="logo" width="300" height="300">
   </div>
@@ -144,11 +145,25 @@
         <div id="autocompleteDropdown" class="autocomplete-content">
           <div id="autocompleteContent"></div>
         </div>
-        <button type="submit" style="position: absolute; right: 0; top: 0; height: 100%;">Go!</button>
+        <button type="submit" id="goButton" style="position: absolute; right: 0; top: 0; height: 100%;">
+          <span id="buttonText">Go!</span>
+          <img id="loadingIcon" src="loading.gif" style="display: none;" alt="Loading..." width="16" height="16">
+        </button>
+
 
       </div>
     </form>
   </div>
 </div>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    var btn1 = document.getElementById("goButton");
+
+    btn1.addEventListener("click", function() {
+      console.log("heyy");
+      btn1.hidden=true;
+    });
+  });
+</script>
 </body>
 </html>

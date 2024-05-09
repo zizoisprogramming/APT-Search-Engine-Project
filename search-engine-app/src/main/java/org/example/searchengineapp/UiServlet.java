@@ -48,9 +48,9 @@ public class UiServlet extends HttpServlet {
 
             List<WebPage> result = q.process_query(query);
 
-            // Calculate the starting index and ending index for the current page
-            int startIndex = (page - 1) * resultsPerPage;
-            int endIndex = Math.min(startIndex + resultsPerPage, result.size());
+//            // Calculate the starting index and ending index for the current page
+//            int startIndex = (page - 1) * resultsPerPage;
+//            int endIndex = Math.min(startIndex + resultsPerPage, result.size());
             long endTime = System.currentTimeMillis();
             long elapsedTime = endTime - startTime;
 
@@ -97,8 +97,8 @@ public class UiServlet extends HttpServlet {
                     "    }\n" +
                     "\n" +
                     "    p {\n" +
-                    "        margin: 0;\n" +
-                    "        padding: 0;\n" +
+                    "        margin: 10;\n" +
+                    "        padding: 5;\n" +
                     "        font-size: 14px;\n" +
                     "        color: #4d5156;\n" +
                     "    }\n" +
@@ -114,6 +114,7 @@ public class UiServlet extends HttpServlet {
                     "        background-color: #FFFDF9;\n" +
                     "        border-radius: 8px;\n" +
                     "        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);\n" +
+                    " word-wrap: break-word;\n"+
                     "    }\n" +
                     "\n" +
                     "    .result:hover {\n" +
@@ -141,7 +142,7 @@ public class UiServlet extends HttpServlet {
                     "        margin-top: 20px;\n" +
                     "    }\n" +
                     "\n" +
-                    "    .pagination_section a {\n" +
+                    "    .pagination_section button {\n" +
                     "        color: #1a0dab;\n" +
                     "        padding: 5px 10px;\n" +
                     "        margin: 0 5px;\n" +
@@ -150,7 +151,7 @@ public class UiServlet extends HttpServlet {
                     "        text-decoration: none;\n" +
                     "    }\n" +
                     "\n" +
-                    "    .pagination_section a:hover {\n" +
+                    "    .pagination_section button:hover {\n" +
                     "        background-color: #f1f1f1;\n" +
                     "    }\n" +
                     "\n" +
@@ -291,54 +292,84 @@ public class UiServlet extends HttpServlet {
             out.println("<div id=\"autocompleteContent\"></div>");
             out.println("</div>");
 
-            out.println("<button type=\"submit\">Go!</button>");
+            out.println("<button type=\"submit\" id=\"goButton\">Go!</button>");
             out.println("</form>");
             out.println("</div>");
             out.println("</div>");
 
-            out.println("<p>Elapsed Time: " + elapsedTime + " milliseconds " + result.size() + " results</p>");
+            out.println("<p style=\"padding: 20px; color: #FF4D00;\">Elapsed Time: " + elapsedTime + " milliseconds " + result.size() + " results</p>");
 //        out.println("<p>Query: " + query + "</p>");
 
-            for (int i = startIndex; i < endIndex; i++) {
+            for (int i = 0; i < result.size(); i++) {
                 WebPage wp = result.get(i);
                 String body_html = formatbody(wp.getBody(), query);
-                out.println("<div class=\"result\">");
+                out.println("<div class=\"result\" id=\""+i+"\">");
                 out.println("<h4>Title: " + wp.getTitle() + "</h4>");
                 out.println("<a href=\"" + wp.getUrl() + "\">Url: " + wp.getUrl() + "</a>");
                 out.println(body_html);
                 out.println("</div>");
-
             }
             // Generate pagination links
             int totalPages = (int) Math.ceil((double) result.size() / resultsPerPage);
             out.println("<div class=\"pagination_section\">");
             System.out.println(query);
             for (int i = 1; i <= totalPages; i++) {
-                if(query.contains("\"")) {
-                    if (Math.abs(i - page) < 4)
-                        out.println("<a href=\'?query=" + query + "&page=" + i + "\'>Page " + i + "</a>");
-                    else if (i == 1) {
-                        out.println("<a href=\'?query=" + query + "&page=" + i + "\'>Page " + i + "</a> <p>....</p>");
-
-                    } else if (i == totalPages) {
-                        out.println("<p>....</p><a href=\'?query=" + query + "&page=" + i + "\'>Page " + i + "</a>");
-
-                    }
-                }
-                else
-                {
-                    if (Math.abs(i - page) < 4)
-                        out.println("<a href=\"?query=" + query + "&page=" + i + "\">Page " + i + "</a>");
-                    else if (i == 1) {
-                        out.println("<a href=\"?query=" + query + "&page=" + i + "\">Page " + i + "</a> <p>....</p>");
-
-                    } else if (i == totalPages) {
-                        out.println("<p>....</p><a href=\"?query=" + query + "&page=" + i + "\">Page " + i + "</a>");
-
-                    }
-                }
+                out.println("<button class=\"pages\" id=\"b"+i+"\">Page " + i + "</button>");
             }
             out.println("</div>");
+            out.println("\n" +
+                    "<script>\n" +
+                    "  document.addEventListener(\"DOMContentLoaded\", function() {\n" +
+                    "    var btn1 = document.getElementById(\"goButton\");\n" +
+                    "\n" +
+                    "    btn1.addEventListener(\"click\", function() {\n" +
+                    "      console.log(\"heyy\");\n" +
+                    "      btn1.hidden=true;\n" +
+                    "    });\n" +
+                    "  });\n" +
+                    "function showElementsInRange(startIndex, endIndex) {\n" +
+                            "    var elements = document.getElementsByClassName(\"result\");\n" +
+                            "\n" +
+                            "    for (var i = 0; i < elements.length; i++) {\n" +
+                            "        elements[i].style.display = \"none\";\n" +
+                            "    }\n" +
+                            "\n" +
+                            "    for (var j = startIndex; j < Math.min(endIndex, elements.length); j++) {\n" +
+                            "        elements[j].style.display = \"block\";\n" +
+                            "    }\n" +
+                            "}\n"+
+                    "function showButtonsInRange(startIndex, endIndex) {\n" +
+                    "    var elements = document.getElementsByClassName(\"pages\");\n" +
+                    "\n" +
+                    "    for (var i = 0; i < elements.length; i++) {\n" +
+                    "        elements[i].style.display = \"none\";\n" +
+                    "    }\n" +
+                    "\n" +
+                    "    for (var j = Math.max(startIndex,0); j < Math.min(endIndex, elements.length); j++) {\n" +
+                    "        elements[j].style.display = \"block\";\n" +
+                    "    }\n" +
+                    "}\n"+
+                    "showElementsInRange(0,10);"+
+                    "showButtonsInRange(0,10);"+
+                    "function addEventListenersToButtons(buttons) {\n" +
+                    "    buttons.forEach(function(button, index) {\n" +
+                    "        button.addEventListener(\"click\", function() {\n" +
+                    "            // Calculate the range based on the button index\n" +
+                    "            var startIndex = index * 10;\n" +
+                    "            var endIndex = startIndex + 10;\n" +
+                    "            // Call the function to show elements within the calculated range\n" +
+                    "            showElementsInRange(startIndex, endIndex);\n" +
+                    "            showButtonsInRange(index-4, index+4);\n" +
+                    "        });\n" +
+                    "    });\n" +
+                    "}\n" +
+                    "\n" +
+                    "// Get all buttons with a specific class\n" +
+                    "var buttons = document.querySelectorAll(\".pages\");\n" +
+                    "\n" +
+                    "// Add event listeners to the buttons\n" +
+                    "addEventListenersToButtons(buttons);"+
+                    "</script>");
 
             out.println("</body>");
             out.println("</html>");
@@ -347,8 +378,8 @@ public class UiServlet extends HttpServlet {
     }
     private String formatbody(String body,String query)
     {
-        String regex = "[\\p{Punct}]";
-        String[] words = body.replaceAll(regex,"").split("\\s+");
+//        String regex = "[\\p{Punct}]";
+        String[] words = body.split("\\s+");
         String[] highlightWords_aux=query.replaceAll("\"","").split("\\s+");
         // set for query words
         Set<String> highlightWords = new HashSet<>();
@@ -374,7 +405,7 @@ public class UiServlet extends HttpServlet {
 
         // Close the paragraph tag
         htmlOutput.append("</p>");
-        return htmlOutput.toString();
+        return htmlOutput.toString()+"...";
     }
     public void destroy() {
         queryDB.close();

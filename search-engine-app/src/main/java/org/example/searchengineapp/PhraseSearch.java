@@ -28,7 +28,7 @@ public class PhraseSearch
             {
                 System.out.println("now scanning"+entry.getKey());
                 String body = result.getString("body");
-                System.out.println(body);
+//                System.out.println(body);
                 if (!body.toLowerCase().contains(" "+modified_query.toLowerCase()+" "))
                 {
                     System.out.println(body.contains("phrase not found"));

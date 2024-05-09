@@ -32,7 +32,7 @@ public class QueryProcessor {
         connectDB c = new connectDB();
         this.collection = c.connection();
         this.ranker=new Ranker();
-        readStopWords("C:\\Users\\ASM EL Masrya\\Desktop\\ostor yarab\\APT-Search-Engine-Project\\search-engine-app\\src\\main\\java\\org\\example\\searchengineapp\\stop_words.txt");
+        readStopWords("F:\\APT-Search-Engine-Project\\search-engine-app\\src\\main\\java\\org\\example\\searchengineapp\\stop_words.txt");
     }
     public static void readStopWords(String filePath) {
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
@@ -200,36 +200,45 @@ public class QueryProcessor {
 
         ranker.rankbyTag(TagPos,urlScore);
 
-        ////debugging
+//        ////debugging
 //        System.out.println("after tag ranking");
 //        printScoreMap();
-        //
+//        //
 
         ranker.rank_by_popularity(urlScore);
 
         ////debugging
-//        System.out.println("after popularity ranking");
-//        printScoreMap();
+       // System.out.println("after popularity ranking");
+       // printScoreMap();
         //
         //TODO:this should be a list of webpages
         //web pages are objects that carry url,body,title attributes
 
         List<WebPage> rankedWebPages=webpageConnect.getWebPages(urlScore);
 
-        for(WebPage wp:rankedWebPages)
-        {
-            System.out.println(wp.getTitle());
-        }
-        System.out.println(rankedWebPages.size());
+//        for(WebPage wp:rankedWebPages)
+//        {
+//            System.out.println(wp.getTitle());
+//        }
+//        System.out.println(rankedWebPages.size());
 
         //sort
-        Collections.sort(rankedWebPages);
+       // Collections.sort(rankedWebPages);
+        // Sort the list based on the score
+        Collections.sort(rankedWebPages, new Comparator<WebPage>() {
+            @Override
+            public int compare(WebPage page1, WebPage page2) {
+                // Compare the scores of the web pages
+                // Ascending order (for descending, swap page1 and page2)
+                return Double.compare(page2.getScore(), page1.getScore());
+            }
+        });
 
         ////sorted
 //        System.out.println("after sorting");
 //        for(WebPage wp:rankedWebPages)
 //        {
-//            System.out.println(wp.getTitle());
+//            System.out.println(wp.getUrl());
 //            System.out.println(wp.getScore());
 //        }
 //

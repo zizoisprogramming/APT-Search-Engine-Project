@@ -1,6 +1,6 @@
 package org.example.searchengineapp;
 
-public class WebPage implements Comparable<WebPage> {
+public class WebPage  {
     //,url,id,any other data
     private String url;
     private String body;
@@ -31,9 +31,9 @@ public class WebPage implements Comparable<WebPage> {
         this.url = url;
     }
 
-    @Override
-    public int compareTo(WebPage o)
-    {
-        return (int) (o.Score*100000-this.Score*100000);
-    }
+//    @Override
+//    //public int compareTo(WebPage o)
+//    {
+//        return (int) (o.Score*100000-this.Score*100000);
+//    }
 }
