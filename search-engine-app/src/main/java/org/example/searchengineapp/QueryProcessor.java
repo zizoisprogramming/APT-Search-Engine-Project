@@ -32,7 +32,7 @@ public class QueryProcessor {
         connectDB c = new connectDB();
         this.collection = c.connection();
         this.ranker=new Ranker();
-        readStopWords("F:\\APT-Search-Engine-Project\\search-engine-app\\src\\main\\java\\org\\example\\searchengineapp\\stop_words.txt");
+        readStopWords("C:\\Users\\ASM EL Masrya\\Desktop\\ostor yarab\\APT-Search-Engine-Project\\search-engine-app\\src\\main\\java\\org\\example\\searchengineapp\\stop_words.txt");
     }
     public static void readStopWords(String filePath) {
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
@@ -139,7 +139,7 @@ public class QueryProcessor {
             Document result = collection.find(Filters.eq("_id", str)).first();
             if(result!=null)
             { //result has the document with id=word
-                System.out.println("found matching doc for word "+str+"doc is"+result);
+//                System.out.println("found matching doc for word "+str+"doc is"+result);
                 matchingDocs.add(result);
                 try {
                     mapping(result,str);

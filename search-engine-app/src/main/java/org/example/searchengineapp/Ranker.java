@@ -14,7 +14,7 @@ public class Ranker {
 
     public Ranker()
     {
-        readStopWords("F:\\APT-Search-Engine-Project\\search-engine-app\\src\\main\\java\\org\\example\\searchengineapp\\stop_words.txt");
+        readStopWords("C:\\Users\\ASM EL Masrya\\Desktop\\ostor yarab\\APT-Search-Engine-Project\\search-engine-app\\src\\main\\java\\org\\example\\searchengineapp\\stop_words.txt");
     }
     public static void readStopWords(String filePath) {
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
@@ -112,6 +112,7 @@ public class Ranker {
     {
         boolean phrasing = false;
         String text=query;
+        wp.setBody(wp.getBody().replaceAll("[\\p{Punct}]",""));
         if(query.contains("\""))
         {
             text=query.replaceAll("\"","");
@@ -127,7 +128,7 @@ public class Ranker {
             String[] words=text.split(" ");
             index=stem(wp.getBody().toLowerCase(),words);
         }
-        System.out.println(index);
+//        System.out.println(index);
         Integer start=0,end=0;
         if (index != -1) { // Check if the index is found
             if (index - 100 > 0) {
@@ -214,9 +215,9 @@ public class Ranker {
             String stemmed = obj.stem(str).toLowerCase();
             for(int i=0;i<bodyWords.length;i++)
             {
-                if(obj.stem(bodyWords[i]).equals(stemmed)&&bodyWords[i].indexOf(str)==0 && !StopWords.contains(str.toLowerCase()))
+                if(obj.stem(bodyWords[i]).equals(stemmed) && !StopWords.contains(str.toLowerCase())&&(body.indexOf(" "+bodyWords[i]+" ")!=-1||body.indexOf(" "+bodyWords[i])!=-1))
                 {
-                    System.out.println("found");
+//                    System.out.println("found");
                     return body.indexOf(" "+bodyWords[i]+" ")!=-1?body.indexOf(" "+bodyWords[i]+" "):body.indexOf(" "+bodyWords[i]);
                 }
             }

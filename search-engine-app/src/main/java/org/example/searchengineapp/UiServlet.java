@@ -340,9 +340,11 @@ public class UiServlet extends HttpServlet {
                             "}\n"+
                     "function showButtonsInRange(startIndex, endIndex) {\n" +
                     "    var elements = document.getElementsByClassName(\"pages\");\n" +
+
                     "\n" +
                     "    for (var i = 0; i < elements.length; i++) {\n" +
                     "        elements[i].style.display = \"none\";\n" +
+                    "elements[i].style.border = \"0px solid #2c3e50\"; "+
                     "    }\n" +
                     "\n" +
                     "    for (var j = Math.max(startIndex,0); j < Math.min(endIndex, elements.length); j++) {\n" +
@@ -350,7 +352,7 @@ public class UiServlet extends HttpServlet {
                     "    }\n" +
                     "}\n"+
                     "showElementsInRange(0,10);"+
-                    "showButtonsInRange(0,10);"+
+                    "showButtonsInRange(0,5);"+
                     "function addEventListenersToButtons(buttons) {\n" +
                     "    buttons.forEach(function(button, index) {\n" +
                     "        button.addEventListener(\"click\", function() {\n" +
@@ -359,13 +361,15 @@ public class UiServlet extends HttpServlet {
                     "            var endIndex = startIndex + 10;\n" +
                     "            // Call the function to show elements within the calculated range\n" +
                     "            showElementsInRange(startIndex, endIndex);\n" +
-                    "            showButtonsInRange(index-4, index+4);\n" +
+                    "            showButtonsInRange(index-5, index+5);\n" +
+                    "buttons[index].style.border = \"2px solid #2c3e50\"; "+
                     "        });\n" +
                     "    });\n" +
                     "}\n" +
                     "\n" +
                     "// Get all buttons with a specific class\n" +
                     "var buttons = document.querySelectorAll(\".pages\");\n" +
+                    "buttons[0].style.border = \"2px solid #2c3e50\"; "+
                     "\n" +
                     "// Add event listeners to the buttons\n" +
                     "addEventListenersToButtons(buttons);"+
