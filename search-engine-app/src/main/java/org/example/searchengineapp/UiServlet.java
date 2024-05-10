@@ -314,7 +314,15 @@ public class UiServlet extends HttpServlet {
             out.println("<div class=\"pagination_section\">");
             System.out.println(query);
             for (int i = 1; i <= totalPages; i++) {
+                if(i==totalPages)
+                {
+                    out.println("<p class=\"dots\" id=\"dot2\">...</p>");
+                }
                 out.println("<button class=\"pages\" id=\"b"+i+"\">Page " + i + "</button>");
+                if(i==1)
+                {
+                    out.println("<p class=\"dots\" id=\"dot1\">...</p>");
+                }
             }
             out.println("</div>");
             out.println("\n" +
@@ -340,19 +348,29 @@ public class UiServlet extends HttpServlet {
                             "}\n"+
                     "function showButtonsInRange(startIndex, endIndex) {\n" +
                     "    var elements = document.getElementsByClassName(\"pages\");\n" +
-
+                    "    var dots = document.getElementsByClassName(\"dots\");\n" +
                     "\n" +
                     "    for (var i = 0; i < elements.length; i++) {\n" +
                     "        elements[i].style.display = \"none\";\n" +
-                    "elements[i].style.border = \"0px solid #2c3e50\"; "+
+                    "        elements[i].style.border = \"0px solid #2c3e50\"; "+
                     "    }\n" +
                     "\n" +
                     "    for (var j = Math.max(startIndex,0); j < Math.min(endIndex, elements.length); j++) {\n" +
                     "        elements[j].style.display = \"block\";\n" +
                     "    }\n" +
+                    "if(elements[0].style.display===\"none\")"+
+                    "{elements[0].style.display=\"block\";\n " +
+                    "dots[0].style.display=\"block\";}" +
+                    "else{dots[0].style.display=\"none\";}"+
+
+                    "if(elements[elements.length-1].style.display===\"none\")"+
+                    "{elements[elements.length-1].style.display=\"block\";\n " +
+                    "dots[1].style.display=\"block\";}" +
+                    "else{dots[1].style.display=\"none\";}"+
                     "}\n"+
                     "showElementsInRange(0,10);"+
-                    "showButtonsInRange(0,5);"+
+                    "showButtonsInRange(0,3);"+
+//                    "document.GetElementById(\"dot1\").style.display=\"none\";"+
                     "function addEventListenersToButtons(buttons) {\n" +
                     "    buttons.forEach(function(button, index) {\n" +
                     "        button.addEventListener(\"click\", function() {\n" +
@@ -361,7 +379,7 @@ public class UiServlet extends HttpServlet {
                     "            var endIndex = startIndex + 10;\n" +
                     "            // Call the function to show elements within the calculated range\n" +
                     "            showElementsInRange(startIndex, endIndex);\n" +
-                    "            showButtonsInRange(index-5, index+5);\n" +
+                    "            showButtonsInRange(index-3, index+3);\n" +
                     "buttons[index].style.border = \"2px solid #2c3e50\"; "+
                     "        });\n" +
                     "    });\n" +
