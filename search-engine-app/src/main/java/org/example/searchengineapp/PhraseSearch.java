@@ -19,6 +19,7 @@ public class PhraseSearch
     public void phraseSearch(String query, Map<String,Double> urlScore)
     {
         String modified_query=query.replace("\"", "");
+        String regex = "[\\p{Punct}]";
         List<String> toberemoved=new ArrayList<>();
         for (Map.Entry<String, Double> entry : urlScore.entrySet())
         {
@@ -27,9 +28,9 @@ public class PhraseSearch
             if(result!=null)
             {
                 System.out.println("now scanning"+entry.getKey());
-                String body = result.getString("body");
+                String body = result.getString("body").replaceAll(regex,"");
 //                System.out.println(body);
-                if (!body.toLowerCase().contains(" "+modified_query.toLowerCase()+" "))
+                if (!phraseContain(body.toLowerCase(),modified_query.toLowerCase()))
                 {
                     System.out.println(body.contains("phrase not found"));
                     toberemoved.add(entry.getKey());
@@ -41,6 +42,25 @@ public class PhraseSearch
         {
             urlScore.remove(str);
         }
+    }
+
+    public Boolean phraseContain(String body,String phrase)
+    {
+        String []phraseWords=phrase.split(" ");
+        int i=0;
+        for(String str:phraseWords)
+        {
+            if(!body.contains(" "+str+" "))
+            {
+                return false;
+            }
+            i=body.indexOf(" "+str+" ",i);
+            if(i==-1)
+            {
+                return false;
+            }
+        }
+        return true;
     }
 
     public void bonus(String query, Map<String,Double> urlScore)
@@ -74,13 +94,13 @@ public class PhraseSearch
                 }
                 notPhrase=processedQuery.substring(indexNot+3,indexNot+6 + lastindex);
                 System.out.println("NOT PHRASE");
-                System.out.println(urlBody.size());
+//                System.out.println(urlBody.size());
                 notPhrase=notPhrase.replaceAll("\"","").trim();
                 System.out.println(notPhrase);
 
                 processedQuery = sb.toString().trim();
                 for (Map.Entry<String, String> entry : urlBody.entrySet()) {
-                    if (entry.getValue().toLowerCase().contains(" "+notPhrase.toLowerCase()+" "))
+                    if (phraseContain(entry.getValue().toLowerCase(),notPhrase.toLowerCase()))
                     {
                         toberemoved.add(entry.getKey());
                     }
@@ -93,7 +113,7 @@ public class PhraseSearch
             System.out.println("to look for");
             processedQuery=processedQuery.replaceAll("\"","").trim();
             for (Map.Entry<String, String> entry : urlBody.entrySet()) {
-                if (!entry.getValue().toLowerCase().contains(" "+processedQuery.toLowerCase()+" "))
+                if (!phraseContain(entry.getValue().toLowerCase(),processedQuery.toLowerCase()))
                 {
                     toberemoved.add(entry.getKey());
                 }
@@ -111,7 +131,7 @@ public class PhraseSearch
                 for (Map.Entry<String, String> entry : urlBody.entrySet()) //key is url value is body
                 {
                     System.out.println("now scanning"+entry.getKey());
-                    if (!entry.getValue().toLowerCase().contains(" "+str.trim().toLowerCase()+" "))
+                    if (!phraseContain(entry.getValue().toLowerCase(),str.trim().toLowerCase()))
                     {
                         System.out.println("phrase not found");
                         toberemoved.add(entry.getKey());
@@ -130,7 +150,7 @@ public class PhraseSearch
                 Boolean Remove = true;
                 for(String str:Phrases)
                 {
-                    if (entry.getValue().toLowerCase().contains(" "+str.trim().toLowerCase()+" "))
+                    if (phraseContain(entry.getValue().toLowerCase(),str.trim().toLowerCase()))
                     {
 //                        System.out.println("phrase found");
                         Remove=false;
@@ -170,7 +190,7 @@ public class PhraseSearch
             for (Map.Entry<String, String> entry : urlBody.entrySet()) //key is url value is body
             {
                 String tobeSearched=entry.getValue().toLowerCase();
-                if (!((tobeSearched.contains(" "+firstPhrase+" ")&&tobeSearched.contains(" "+secondPhrase+" "))||tobeSearched.contains(" "+thirdPhrase+" ")))
+                if (!((phraseContain(tobeSearched,firstPhrase)&&phraseContain(tobeSearched,secondPhrase))||phraseContain(tobeSearched,thirdPhrase)))
                 {
                     System.out.println("not found");
                     toberemoved.add(entry.getKey());

@@ -121,7 +121,8 @@ public class Ranker {
         Integer index=0;
         if(phrasing)
         {
-            index=wp.getBody().toLowerCase().indexOf(" "+text.toLowerCase()+" ");
+            String[] pharseWords=text.toLowerCase().split(" ");
+            index=wp.getBody().toLowerCase().indexOf(" "+text.toLowerCase()+" ")!=-1?wp.getBody().toLowerCase().indexOf(" "+text.toLowerCase()+" "):wp.getBody().toLowerCase().indexOf(" "+pharseWords[0]+" ");
         }
         else
         {
