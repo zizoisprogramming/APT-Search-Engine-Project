@@ -171,6 +171,7 @@ public class Ranker {
         }
 
         String[] phrases= processedQuery.trim().replaceAll("\"","").split("\\s+AND\\s+|\\s+OR\\s+");
+        String[] phrasesWords=processedQuery.toLowerCase().replaceAll("\"","").replaceAll("\\s+AND\\s+|\\s+OR\\s+","").split(" ");
         Integer index=0;
         for(String phrase:phrases)
         {
@@ -179,6 +180,18 @@ public class Ranker {
             {
                 index=wp.getBody().toLowerCase().indexOf(" "+phrase.toLowerCase()+ " ");
                 break;
+            }
+        }
+
+        if(index==-1)
+        {
+            for(String word:phrasesWords)
+            {
+                if(wp.getBody().toLowerCase().contains(" "+word+" "))
+                {
+                    index=wp.getBody().toLowerCase().indexOf(" "+word+ " ");
+                    break;
+                }
             }
         }
 

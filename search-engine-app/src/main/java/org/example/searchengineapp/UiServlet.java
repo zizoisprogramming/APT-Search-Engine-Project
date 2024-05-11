@@ -427,7 +427,7 @@ public class UiServlet extends HttpServlet {
 
         // Close the paragraph tag
         htmlOutput.append("</p>");
-        return htmlOutput.toString()+"...";
+        return String.valueOf(htmlOutput);
     }
     public void destroy() {
         queryDB.close();
