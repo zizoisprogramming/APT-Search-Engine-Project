@@ -20,7 +20,7 @@ public class connectDB //indexer db
             System.out.println("Created Mongo Connection successfully");
 
             MongoDatabase db = mongoClient.getDatabase("Web-urls");
-            MongoCollection<Document> collection = db.getCollection("urls");
+            MongoCollection<Document> collection = db.getCollection("clean_indexer");
 
             return collection;
         }

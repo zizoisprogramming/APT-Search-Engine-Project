@@ -9,8 +9,7 @@ public class WebPage  {
     public WebPage(String u,String b,String t,Double s)
     {
         url=u;
-        String regex = "[\\p{Punct}]";
-        body=b.replaceAll(regex,"");
+        body=b;
         title=t;
         Score=s;
     }

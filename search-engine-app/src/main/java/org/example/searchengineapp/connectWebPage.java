@@ -18,7 +18,7 @@ public class connectWebPage
             // Creating a Mongo client
             MongoClient mongoClient = new MongoClient("localhost", 27017);
             MongoDatabase db = mongoClient.getDatabase("webPages");
-            collection = db.getCollection("dum");
+            collection = db.getCollection("clean_run");
             System.out.println("Created Mongo Connection successfully");
 
             return collection;
