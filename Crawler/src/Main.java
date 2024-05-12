@@ -230,23 +230,35 @@ class spiderWebs implements Runnable {
 
         return compactStringBuilder.toString();
     }
-    public static String normalizeURL(String urlString) {
+     public static String normalizeURL(String urlString) {
         try {
             // Parse the URL string into URI
             URI uri = new URI(urlString);
 
             // Normalize the scheme and host to lowercase
+            if (uri.getScheme() == null || uri.getHost() == null)
+                return null;
+
             String scheme = uri.getScheme().toLowerCase();
             String host = uri.getHost().toLowerCase();
 
             // Remove default port if present
+
             int port = uri.getPort();
             if ((scheme.equals("http") && port == 80) || (scheme.equals("https") && port == 443)) {
                 port = -1; // Default port, remove it
             }
 
-            // Reconstruct the normalized URI
-            URI normalizedURI = new URI(scheme, uri.getUserInfo(), host, port, uri.getPath(), uri.getQuery(), null);
+            // Reconstruct the normalized URI with sorted query parameters
+            URI normalizedURI = new URI(
+                    scheme,
+                    uri.getUserInfo(),
+                    host,
+                    port,
+                    uri.getPath(),
+                    normalizeQuery(uri.getQuery()),
+                    null
+            );
 
             // Remove fragment
             String normalizedUrl = normalizedURI.toString();
@@ -260,6 +272,33 @@ class spiderWebs implements Runnable {
             e.printStackTrace();
             return null;
         }
+    }
+
+    private static String normalizeQuery(String query) {
+        if (query == null || query.isEmpty()) {
+            return null;
+        }
+
+        // Split the query into key-value pairs
+        String[] pairs = query.split("&");
+        Map<String, String> params = new TreeMap<>();
+        for (String pair : pairs) {
+            String[] keyValue = pair.split("=");
+            if (keyValue.length > 0) {
+                String key = keyValue[0];
+                String value = keyValue.length > 1 ? keyValue[1] : "";
+                params.put(key, value);
+            }
+        }
+
+        // Reconstruct the normalized query string with sorted parameters
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<String, String> entry : params.entrySet()) {
+            sb.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
+        }
+        sb.deleteCharAt(sb.length() - 1); // Remove the last '&'
+
+        return sb.toString();
     }
     public static void crawl(String url, BufferedWriter linksWriter, BufferedWriter compactStringsWriter) {
         if (!isValidURL(url)) {
