@@ -234,7 +234,7 @@ class spiderWebs implements Runnable {
 
         return compactStringBuilder.toString();
     }
-     public static String normalizeURL(String urlString) {
+    public static String normalizeURL(String urlString) {
         try {
             // Parse the URL string into URI
             URI uri = new URI(urlString);
@@ -309,7 +309,6 @@ class spiderWebs implements Runnable {
             System.out.println("Invalid URL: " + url);
             return;
         }
-        url = normalizeURL(url);
         if (isAllowed(url)) {
             try {
                 Connection con = Jsoup.connect(url);
@@ -321,6 +320,11 @@ class spiderWebs implements Runnable {
                     synchronized (SharedVars.linksLock) {
                         for (Element link : doc.select("a[href]")) {
                             String nextLink = link.absUrl("href");
+                            if(nextLink.isEmpty() || !isValidURL(nextLink))
+                                continue;
+                            nextLink = normalizeURL(nextLink);
+                            if(nextLink == null)
+                                continue;
                             if (!SharedVars.files.contains(nextLink)) {
                                 System.out.println("Found: " + nextLink);
                                 linksWriter.write(nextLink + "\n"); // Write crawled link to output file
