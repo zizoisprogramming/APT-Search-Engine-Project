@@ -10,7 +10,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-class Crawler {
+class Crawler  {
     // This function reads the starting file (Seed set)
     private static final String LINKS_OUTPUT_FILE = "links.txt"; // File for storing crawled links
     private static final String COMPACT_STRINGS_OUTPUT_FILE = "compact_strings.txt"; // File for storing compact strings
@@ -64,7 +64,7 @@ class Crawler {
 
     public static void main(String[] args) {
         // Program logic
-        String filePath = "D:\\CMP Year two\\second semester\\Advanced Programming\\Project\\Crawler\\seed.txt";
+        String filePath = "./seeds.txt";
         readSeed(filePath, true);
 
         // SharedVars.numThreads = Integer.parseInt(args[0]); // Set the number of threads
@@ -230,11 +230,43 @@ class spiderWebs implements Runnable {
 
         return compactStringBuilder.toString();
     }
+    public static String normalizeURL(String urlString) {
+        try {
+            // Parse the URL string into URI
+            URI uri = new URI(urlString);
+
+            // Normalize the scheme and host to lowercase
+            String scheme = uri.getScheme().toLowerCase();
+            String host = uri.getHost().toLowerCase();
+
+            // Remove default port if present
+            int port = uri.getPort();
+            if ((scheme.equals("http") && port == 80) || (scheme.equals("https") && port == 443)) {
+                port = -1; // Default port, remove it
+            }
+
+            // Reconstruct the normalized URI
+            URI normalizedURI = new URI(scheme, uri.getUserInfo(), host, port, uri.getPath(), uri.getQuery(), null);
+
+            // Remove fragment
+            String normalizedUrl = normalizedURI.toString();
+            if (uri.getFragment() != null) {
+                normalizedUrl = normalizedUrl.split("#")[0];
+            }
+
+            return normalizedUrl;
+        } catch (URISyntaxException e) {
+            // Handle invalid URI syntax
+            e.printStackTrace();
+            return null;
+        }
+    }
     public static void crawl(String url, BufferedWriter linksWriter, BufferedWriter compactStringsWriter) {
         if (!isValidURL(url)) {
             System.out.println("Invalid URL: " + url);
             return;
         }
+        url = normalizeURL(url);
         if (isAllowed(url)) {
             try {
                 Connection con = Jsoup.connect(url);
